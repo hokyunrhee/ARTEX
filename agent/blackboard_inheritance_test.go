@@ -82,26 +82,45 @@ func TestGraphOverviewExpandsAssociatedCompanyScope(t *testing.T) {
 	if !ok {
 		t.Fatalf("coverage missing: %#v", overview["coverage"])
 	}
-	scopeRows, ok := coverage["scope"].([]map[string]any)
-	if !ok || len(scopeRows) != 1 {
-		t.Fatalf("task scope missing: %#v", coverage["scope"])
+	// graph_overview stopped embedding coverage.scope (scope roots plus company
+	// enrichment) in 06a43f3 to keep the per-round planner context small. The
+	// task's scope must still resolve to the associated company and its complete
+	// rule set through the stores that the on-demand tools read.
+	scopeRows, err := assets.ListTaskScopeWithSources(task.ID)
+	if err != nil || len(scopeRows) != 1 || scopeRows[0].Kind != "company" ||
+		scopeRows[0].CompanyID == nil || *scopeRows[0].CompanyID != companyID {
+		t.Fatalf("task scope missing: rows=%+v err=%v", scopeRows, err)
 	}
-	companyScope, ok := scopeRows[0]["company_scope"].([]map[string]any)
-	if !ok || len(companyScope) != len(inputs) {
-		t.Fatalf("company scope not expanded: %#v", scopeRows[0])
+	companyScope, err := companies.GetScope(companyID)
+	if err != nil || len(companyScope) != len(inputs) {
+		t.Fatalf("company scope not expanded: rules=%+v err=%v", companyScope, err)
 	}
 	kinds := make(map[string]string, len(companyScope))
+	var keywords []string
 	for _, rule := range companyScope {
-		kinds[fmt.Sprint(rule["kind"])] = fmt.Sprint(rule["value"])
+		value := rule.Raw
+		if value == "" {
+			switch rule.Kind {
+			case "domain":
+				value = rule.Domain
+			case "ip", "cidr":
+				value = rule.Net
+			default:
+				value = rule.Value
+			}
+		}
+		kinds[rule.Kind] = value
+		if rule.Kind == "keyword" && rule.Raw != "" {
+			keywords = append(keywords, rule.Raw)
+		}
 	}
 	for _, input := range inputs {
 		if kinds[input.Kind] != input.Value {
 			t.Errorf("scope %s=%q want %q", input.Kind, kinds[input.Kind], input.Value)
 		}
 	}
-	keywords, ok := scopeRows[0]["company_keywords"].([]string)
-	if !ok || len(keywords) != 1 || keywords[0] != keyword {
-		t.Fatalf("company keywords missing: %#v", scopeRows[0]["company_keywords"])
+	if len(keywords) != 1 || keywords[0] != keyword {
+		t.Fatalf("company keywords missing: %#v", keywords)
 	}
 	if hc, _ := coverage["host_count"].(int); hc < 1 {
 		t.Fatalf("company asset host not counted in agent context: %#v", coverage["host_count"])
