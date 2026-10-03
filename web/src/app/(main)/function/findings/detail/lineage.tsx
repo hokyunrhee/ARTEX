@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import type { Edge, TaskNode } from "@/lib/types";
 
 // FindingLineageView renders the exploration sub-graph from the task's initial
-// node down to this finding's node — the same 攻击链路图 canvas as the task graph,
+// node down to this finding's node — the same attack-chain graph canvas as the task graph,
 // scoped to just this finding's lineage.
 export function FindingLineageView({ findingId }: { findingId: string }) {
   const [nodes, setNodes] = React.useState<TaskNode[]>([]);
@@ -35,17 +35,12 @@ export function FindingLineageView({ findingId }: { findingId: string }) {
   if (loaded && nodes.length === 0) {
     return (
       <p className="text-muted-foreground p-6 text-sm">
-        无链路可展示（该漏洞未关联探索节点，或所属任务已删除）。
+        No chain to display (this finding has no linked exploration node, or its task was deleted).
       </p>
     );
   }
 
   return (
-    <ExplorationGraph
-      nodes={nodes}
-      edges={edges}
-      className="h-[68vh]"
-      emptyHint={loaded ? "无链路" : "加载中…"}
-    />
+    <ExplorationGraph nodes={nodes} edges={edges} className="h-[68vh]" emptyHint={loaded ? "No chain" : "Loading…"} />
   );
 }
