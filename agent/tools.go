@@ -1287,9 +1287,9 @@ func (t *ToolSet) addFinding() actool.CoreTool {
 		}{RecordedFinding: recorded, EvidenceStatus: "bound"}
 		if len(recorded.Traffic.Bindings) == 0 {
 			result.EvidenceStatus = "not_bound"
-			result.EvidenceNote = "漏洞已保存，未绑定流量。TCP/无包情形可正常继续；若已有核实的 HTTP 流量，请用可用的 bind_finding_traffic 或漏洞页面补绑，再完成证据交接。不要重复创建漏洞。"
+			result.EvidenceNote = "Finding saved without traffic bindings. TCP/no-packet cases can continue normally. If verified HTTP traffic is available, use bind_finding_traffic or the finding page to add bindings, then complete evidence handoff. Do not create a duplicate finding."
 			if !findingTrafficBindingEnabled() {
-				result.EvidenceNote = "漏洞已保存。Agent 自动绑定流量已关闭，可在页面人工关联流量。"
+				result.EvidenceNote = "Finding saved. Agent automatic traffic binding is disabled; traffic can be linked manually on the page."
 			}
 		}
 		raw, _ := json.Marshal(result)

@@ -1,0 +1,1569 @@
+[
+  {
+    "key": "graph_overview",
+    "description": "(探索链路图)探索态势蒸馏摘要：资产计数、无接口的站点、frontier、发现、hints(人类/主 agent 的战略提示，生成意图时须纳入)。规划时先调它。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "list_findings",
+    "description": "列本任务及直接关联任务的【确认漏洞】(紧凑：id+task_id+intent_id+vulnclass+severity+摘要+状态)。关联任务条目带 source_task_id/inherited=true 且只读。这里只含漏洞；普通探索事实用 list_facts，详情用 node_detail(id)。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "node_detail",
+    "description": "按 id 取本任务或直接关联任务的【探索图节点】完整内容。继承节点带 source_task_id/inherited=true 且只读。仅限 list_facts/list_findings/graph_overview 返回的探索节点 id；资产请用 list_assets/asset_neighbors。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "探索图节点 id(非资产 id)"
+        }
+      }
+    }
+  },
+  {
+    "key": "expand_digest",
+    "description": "展开一个 cold digest：返回它折叠的成员紧凑列表（id/summary/state/confidence），与概览 recent_facts/recent_done_intents 同形状。要某条完整细节/证据用 node_detail(member_id)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "digest 节点 id（来自概览 cold_digests）"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_worker_output",
+    "description": "取本任务或直接关联任务某条意图(work)的最终输出结论。关联任务结果带 source_task_id/inherited=true 且只读。正常结束返回其总结；被终止(stopped)/异常的 work 返回其截至中止时的最后输出。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "intent_id"
+      ],
+      "properties": {
+        "intent_id": {
+          "type": "integer",
+          "description": "意图 id（= work 句柄）"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_worker_trace",
+    "description": "查看某条意图(work)的【执行过程】（区别于 get_worker_output 只给最终结论）。三种用法：\n① 只传 intent_id → 返回该 work 每一步的摘要流（summary≤100字，含 step_id；只是动作轮廓，不含完整输出）；\n② intent_id + q → 只返回命中关键字的步骤摘要（在摘要和完整输出里都搜；仍只给 summary，要看内容用③）；\n③ intent_id + step_ids → 返回这些步骤的完整内容(detail)；一次最多取 5 个，超出只返回前 5 个并在 notice/omitted_step_ids 里告知未取的。\n典型流程：先①/②定位可疑步骤的 step_id，再用③取其完整输出。不含思考(thinking)步骤。支持直接关联任务的历史 trace；其结果带 source_task_id/inherited=true 且只读。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "intent_id"
+      ],
+      "properties": {
+        "q": {
+          "type": "string",
+          "description": "关键字：只返回摘要/完整输出命中它的步骤（可选；与 step_ids 互斥）"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "摘要流/检索的返回上限（可选）"
+        },
+        "step_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "要取完整内容的 step_id（来自①/②返回；一次最多取 5 个，多传只返回前 5 个，其余在 omitted_step_ids 里列出）"
+        },
+        "intent_id": {
+          "type": "integer",
+          "description": "意图 id（= work 句柄）"
+        }
+      }
+    }
+  },
+  {
+    "key": "search_all_worker_traces",
+    "description": "【通常不推荐使用，因为系统中已经给了大部分信息了】在【本任务其他 work 的执行过程】里按关键字(q)检索——用于找回某个 worker 见过、却没写进 fact 的东西（某路径/token/报错等）。已自动排除你自己这条意图的步骤（那些本就在你上下文里）。只返回命中步骤的摘要(summary≤100字)，每条带 intent_id；据此再用 get_worker_trace(intent_id, step_ids=[...]) 取完整内容。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "q"
+      ],
+      "properties": {
+        "q": {
+          "type": "string",
+          "description": "关键字（在所有 work 步骤的摘要+完整输出里搜）"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回上限，默认 100（可选）"
+        }
+      }
+    }
+  },
+  {
+    "key": "add_intent",
+    "description": "生成【探索方向】写入 frontier，并连入探索链路。意图是开放的探索方向，不是固定类型——用 summary 一句话自由描述要探索/验证/利用什么。\n★优先批量：一轮筛出的多个新方向放进 intents 数组一次提交（比逐条调用省往返）。返回 ids 数组，与 intents 等长同序（失败项 id=0，详情见 errors）。单条则省略 intents 直接给顶层 summary。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "intents": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "【优先用这个】要新增的探索方向数组，按顺序处理。每个元素字段同下方顶层字段（summary/asset_ids/parent_ids/priority）。返回 ids 与本数组等长、同序。"
+        },
+        "summary": {
+          "type": "string",
+          "description": "[单条] 一句话描述这个探索方向：做什么+为什么。已写清方向即可，不依赖资产 id。"
+        },
+        "priority": {
+          "type": "integer",
+          "description": "优先级 0-10，默认5"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "本方向要测试/攻击的【目标资产 id】（**尽量传**，0/1/多个；是 list_assets 返回的资产 id，不是探索节点 id）：这条探索方向针对哪些资产（站点/接口/参数/主机等）。只要方向围绕某些具体资产就务必传上——它是「这条探索打哪些目标」的结构化标记，用于覆盖去重、把意图连入资产链路。仅当纯全局侦察、确实没有具体目标资产时才留空。"
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "上游锚点 id（可选，0/1/多个）：本方向由哪些【已确认的事实(fact)/发现(finding)】综合得出。**只能填已存在的 fact/finding 节点 id,不能填意图/目标/提示**——意图必须锚在已确认知识上,发现驱动而非凭空规划。多个事实共同产生一个新意图就传多个;顶层全新侦察方向请留空（会自动挂到任务起点 origin fact）。"
+        }
+      }
+    }
+  },
+  {
+    "key": "add_hint",
+    "description": "把人类/主 agent 的战略提示挂到探索图，规划者下次生成意图时会读到它。\n★优先批量：多条提示放进 hints 数组一次提交（比逐条调用省往返）。返回 ids 数组，与 hints 等长同序（失败项 id=0，详情见 errors）。单条则省略 hints 直接给顶层 text。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "[单条] 提示内容，如'重点挖认证后接口'"
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "提示内容"
+              },
+              "asset_ids": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "traffic_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "traffic_id"
+                  ],
+                  "properties": {
+                    "note": {
+                      "type": "string",
+                      "description": "该流量支持什么结论"
+                    },
+                    "role": {
+                      "type": "string",
+                      "description": "baseline / proof / verification / supporting"
+                    },
+                    "traffic_id": {
+                      "type": "string",
+                      "description": "真实流量 ID"
+                    }
+                  }
+                },
+                "description": "可选：已核实且对应本提示中具体漏洞的流量引用，保留顺序；交接后 report_finding 可传 evidence_hint_id 携带这些引用。"
+              }
+            }
+          },
+          "description": "【优先用这个】要新增的提示数组，按顺序处理。每个元素字段同下方顶层字段（text/asset_ids/traffic_refs）。返回 ids 与本数组等长、同序。"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "锚定的资产 id（可选，0/1/多个）"
+        },
+        "traffic_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "traffic_id"
+            ],
+            "properties": {
+              "note": {
+                "type": "string",
+                "description": "该流量支持什么结论"
+              },
+              "role": {
+                "type": "string",
+                "description": "baseline / proof / verification / supporting"
+              },
+              "traffic_id": {
+                "type": "string",
+                "description": "真实流量 ID"
+              }
+            }
+          },
+          "description": "可选：已核实且对应本提示中具体漏洞的流量引用，保留顺序；交接后 report_finding 可传 evidence_hint_id 携带这些引用。"
+        }
+      }
+    }
+  },
+  {
+    "key": "steer_work",
+    "description": "给一条正在运行的意图(work)实时注入纠偏指令，不打断它、不丢已有进展：worker 会在下一步动作前收到你的指令并据此调整。用于'别再走 X、聚焦 Y'这类【意图内】纠偏；若方向整个错了应改用 kill_work 再下新意图。建议先用 get_worker_output 看它在干嘛。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "intent_id",
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "给 worker 的纠偏指令，明确让它停止什么、转向什么"
+        },
+        "intent_id": {
+          "type": "integer",
+          "description": "要纠偏的意图 id（= work 句柄）"
+        }
+      }
+    }
+  },
+  {
+    "key": "set_goals",
+    "description": "给【本任务】新增探索目标(goal)。目标=最终可交付/可核验的结果,不是攻击步骤或侦察动作。\n★优先批量:多个目标放进 goals 数组一次提交,返回 ids 与之等长同序(失败项 id=0,详情见 errors)。单条则省略 goals 直接给顶层 text。\nvulnclass 可选:对应漏洞类(如 SQLi/IDOR),业务逻辑类目标留空。目标是否达成由系统判定标记 met,本工具只负责新增。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "[单条] 一个独立可验证的最终目标"
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "【优先用这个】要新增的目标数组,按顺序处理。每个元素:text(必填,一个独立可验证的最终目标)+ vulnclass(可选)。返回 ids 与本数组等长、同序。"
+        },
+        "vulnclass": {
+          "type": "string",
+          "description": "[单条] 对应漏洞类(若明确),如 SQLi/IDOR;业务逻辑目标可留空"
+        }
+      }
+    }
+  },
+  {
+    "key": "set_constraints",
+    "description": "给【本任务】新增操作约束,用来框定探索边界:type=allow(允许做的操作)或 deny(禁止做的操作)。\n约束=对『可以/不可以做哪些操作』的规定(如『仅测当前端口,不扫其他端口』『禁止对生产库做写操作』『只允许被动侦察』),不是目标、也不是攻击步骤。\n★优先批量:多条放进 constraints 数组一次提交,返回 ids 与之等长同序(失败项 id=0,详情见 errors)。单条则省略 constraints 直接给顶层 text/type。\n只登记任务目标/描述里【明确写出】的约束,不要臆造;拿不准类型时用 deny(更保守)。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "[单条] 一条操作约束的内容"
+        },
+        "type": {
+          "type": "string",
+          "description": "[单条] allow(允许)或 deny(禁止);缺省按 deny 处理"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "【优先用这个】要新增的约束数组,按顺序处理。每个元素:text(必填,一条约束)+ type(allow|deny)。返回 ids 与本数组等长、同序。"
+        }
+      }
+    }
+  },
+  {
+    "key": "add_company_scope",
+    "description": "把域名/IP/CIDR/ICP备案/企业关键词加入某公司的【资产范围】——域名、网络和ICP会自动认领命中的资产，关键词只提供给Agent作为范围提示。\n公司名唯一：company 不存在则新建，已存在则复用(只把范围并进去)。\nscope 一行一条，系统自动识别：根域名 / URL / 单个 IP / CIDR 网段 / ICP备案 / 企业关键词。\n务必给 reason 说明归属依据(whois/证书/ASN 等)。\n护栏：拒绝裸 TLD 与过宽网段(IPv4前缀需为/16-/32、IPv6前缀需为/32-/128)，非法行会被跳过并在 errors 返回。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "company",
+        "scope"
+      ],
+      "properties": {
+        "logo": {
+          "type": "string",
+          "description": "公司图标 URL(可选；仅新建公司时生效)"
+        },
+        "scope": {
+          "type": "string",
+          "description": "资产范围，一行一条：域名 / URL / IP / CIDR / ICP备案 / 企业关键词"
+        },
+        "reason": {
+          "type": "string",
+          "description": "归属依据(证据/来源)，务必填写"
+        },
+        "company": {
+          "type": "string",
+          "description": "公司名(不存在则新建、存在则复用；名称唯一)"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_assets",
+    "description": "查询资产库：DSL 表达式搜索，或按 id/ids 直取；支持分页。只返回【本任务及直接关联任务】测试范围内的资产。\nDSL：field=value 模糊(ILIKE) | field==value 精确 | field!=value 排除 | 数字字段支持 > >= < <= | 裸词=全文模糊；AND/OR 组合(AND 优先级高)，可用括号分组。资产类型用独立 type 参数，不写进 DSL。\n未传 id/ids 时 dsl 必须非空（不允许无条件全量查询）。\n可用字段：domain(根/子/服务域名)、root_domain、ip、url、page_title、icp、service_name、app_name、method(如 GET/POST)、service_type(http|other)、record_type(如 A/CNAME)、technology(数组，=模糊 ==精确)、port/status_code/company_id(整数)。\n示例：status_code>=400 AND technology=shiro ；(port==80 OR port==443) AND technology=nginx",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "直接按单个资产 id 取（可选，与 dsl/type 互斥）"
+        },
+        "dsl": {
+          "type": "string",
+          "description": "DSL 查询表达式（语法/字段见工具描述）。未传 id/ids 时必须非空。"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "直接按多个资产 id 取（可选，与 dsl/type 互斥）"
+        },
+        "type": {
+          "type": "string",
+          "description": "资产类型过滤：root_domain|ip|subdomain|app|service|endpoint（独立字段，可与 dsl 叠加；单独 type 不足以查询，仍需 dsl）"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回上限，默认 10（可选）"
+        },
+        "offset": {
+          "type": "integer",
+          "description": "分页偏移，默认 0（可选）"
+        }
+      }
+    }
+  },
+  {
+    "key": "insert_assets",
+    "description": "批量登记新发现的资产，一次可混合多种类型（type 见枚举）。\n各类型必填字段：root_domain→domain；ip→ip（须为 IPv4/IPv6，非主机名）；subdomain→domain；app→app_name；service(HTTP)→url；service(非HTTP)→service_name+port（ip/domain 至少填一个）；endpoint→url+method。其余字段含义见各自说明。\nauth/technologies/params 为追加合并(append)，不覆盖原值。\n返回：{results:[{index,id,type}], errors:[{index,error}]}",
+    "schema": {
+      "type": "object",
+      "required": [
+        "assets"
+      ],
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "ip": {
+                "type": "string",
+                "description": "IP 地址，必须是 IPv4/IPv6 地址，不能填主机名（主机名请用 type=subdomain 的 domain 字段）；ip 类型必填；service/endpoint 类型可填，用于关联 IP"
+              },
+              "icp": {
+                "type": "string",
+                "description": "ICP 备案号（可选）"
+              },
+              "url": {
+                "type": "string",
+                "description": "完整 URL，含协议和端口（HTTP 服务必填；service_type 自动设为 http）"
+              },
+              "auth": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "发现的认证信息列表，每条含 type/username/password 等字段（可选，追加不覆盖）"
+              },
+              "port": {
+                "type": "integer",
+                "description": "端口号（service 非 HTTP 时必填）"
+              },
+              "type": {
+                "enum": [
+                  "root_domain",
+                  "ip",
+                  "subdomain",
+                  "app",
+                  "service",
+                  "endpoint"
+                ],
+                "type": "string",
+                "description": "资产类型"
+              },
+              "domain": {
+                "type": "string",
+                "description": "根域名或子域名（root_domain/subdomain 必填）"
+              },
+              "method": {
+                "type": "string",
+                "description": "HTTP 方法：GET/POST/PUT/PATCH/DELETE 等（endpoint 必填）"
+              },
+              "params": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "请求参数列表，每条含 location(query/body/header/path)/name/value/type（可选，追加不覆盖）"
+              },
+              "app_icp": {
+                "type": "string",
+                "description": "应用 ICP 备案（可选）"
+              },
+              "app_name": {
+                "type": "string",
+                "description": "应用名称（app 类型必填）"
+              },
+              "category": {
+                "type": "string",
+                "description": "应用分类（可选）"
+              },
+              "bundle_id": {
+                "type": "string",
+                "description": "Bundle ID（app 类型可选）"
+              },
+              "company_id": {
+                "type": "integer",
+                "description": "归属企业 id（app 类型可选；app 无法靠 scope 自动归因，需显式指定。id 由 add_company_scope 返回）"
+              },
+              "open_ports": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "port"
+                  ],
+                  "properties": {
+                    "port": {
+                      "type": "integer",
+                      "description": "端口号"
+                    },
+                    "service": {
+                      "type": "string",
+                      "description": "服务名称，如 http/ssh/mysql 等（可选）"
+                    }
+                  }
+                },
+                "description": "开放端口列表（ip 类型可选）"
+              },
+              "page_title": {
+                "type": "string",
+                "description": "页面 <title> 内容（可选）"
+              },
+              "description": {
+                "type": "string",
+                "description": "应用描述（可选）"
+              },
+              "record_type": {
+                "type": "string",
+                "description": "DNS 解析类型：A/AAAA/CNAME/MX 等（subdomain 可选）"
+              },
+              "status_code": {
+                "type": "integer",
+                "description": "HTTP 响应状态码，如 200/301/403/404（可选）"
+              },
+              "favicon_mmh3": {
+                "type": "string",
+                "description": "favicon MMH3 哈希（可选）"
+              },
+              "record_value": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "DNS 解析值列表（subdomain 可选，如 [\"1.2.3.4\",\"2.3.4.5\"]）"
+              },
+              "service_name": {
+                "type": "string",
+                "description": "服务名称，如 ssh/mysql/redis（service 非 HTTP 时必填）"
+              },
+              "technologies": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "指纹/技术栈列表，如 [\"Nginx\",\"Vue\",\"Bootstrap\"]（可选）"
+              },
+              "bound_domains": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "该 IP 绑定的域名列表（ip 类型可选）"
+              },
+              "content_length": {
+                "type": "integer",
+                "description": "HTTP 响应体字节数（可选）"
+              }
+            }
+          },
+          "description": "资产数组，每个元素对应一条资产记录"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_task_worker_traces",
+    "description": "列出指定任务里跑过哪些 work(意图) + 各自步数，用于发现哪些 work 值得翻看(再用 get_task_worker_trace)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "record_fact",
+    "description": "把探索【事实/结论】写入探索图，连到产生它的意图（intent_id）。用于记录探索结果——包括指纹/枚举等【正向结论】，和'端口关闭'/'参数不可注入'/'未发现登录入口'等【否定结论】。\n⚠️一次探索的多个观察要【汇总成一条事实】，不要拆成多条，可以合并成一条事实的就尽量用一条事实表示：summary=对本次结论的总结性一句话，detail=相关细节（可含多个具体项）。例：指纹意图→一条事实 {summary:'识别了 X 站点的技术栈与响应特征', detail:'nginx 1.25 / Vue3 / 200 / title=.. / body_len=..'}，而不是状态码、指纹、标题各记一条。一条意图通常只产出一条事实，拆太碎会让图谱无限膨胀。\n★facts 数组用于一次写多条【彼此不同】的结论（每条可省略 intent_id，默认用顶层 intent_id）。返回 ids 数组，与 facts 等长同序。\n⚠️只写你在工具输出里【真实看到】的结论，不要脑补。evidence 与 confidence 用来防止不准确的结论污染图谱：\n  · evidence=支撑本结论的【一行】关键证据（命令+最能证明的那一两行输出），**务必简洁**——细节已在 detail，这里不要再粘大段输出。\n  · confidence=observed（输出里直接看到）| inferred（据现象推断）。\n  · **否定类结论**（不可注入/端口关闭/未发现入口等）只写\"观察 + 试探性读法\"——陈述你实际看到什么，方向是否放弃由规划者综合全局定；务必给 evidence，手段没穷尽或证据弱（含只探一次、看起来像）标 inferred，确已穷尽且直接看到才标 observed。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "【有多条不同结论时用】事实数组，元素字段同下方顶层字段（summary/detail/evidence/confidence/intent_id/asset_ids）；省略 intent_id 则用顶层 intent_id。返回 ids 与本数组等长、同序。"
+        },
+        "detail": {
+          "type": "string",
+          "description": "本事实的相关细节：把这次探索的多个观察事实都写进这里"
+        },
+        "summary": {
+          "type": "string",
+          "description": "对本次探索结论的【总结性一句话】（是对 detail 的概括）"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "【一行】关键证据：命令 + 最能证明结论的那一两行输出。务必简洁，不要粘大段输出（细节放 detail）。"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "相关资产 id（可选，0/1/多个）：该事实涉及哪些资产"
+        },
+        "intent_id": {
+          "type": "integer",
+          "description": "产生本事实的意图 id（你领到的意图；批量时作为各条默认）"
+        },
+        "confidence": {
+          "type": "string",
+          "description": "observed（输出里直接看到）| inferred（据现象推断）。否定结论务必如实标注。"
+        }
+      }
+    }
+  },
+  {
+    "key": "add_task_scope",
+    "description": "把测试范围加入【本任务】——这是本任务的授权边界，也是资产测试覆盖度的分母。\nkind 支持：company(整个公司名下资产) / root_domain(整个根域，含所有子域) / subdomain(单个精确子域) / ip / cidr / icp / keyword。\n说明：worker 逐个碰到的主机会被系统【自动】加进范围(精确子域)；本工具用于【主动扩大】——把整个根域/整个公司纳入，或补充指定某子域/IP。\nvalue：company 传公司名或 id(公司须已存在)；root_domain/subdomain 传域名；ip/cidr 传 IP 或网段；icp/keyword 传备案号或企业关键词。\n务必给 reason 说明依据(可审计)。多条用 entries 数组。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "[单条] company / root_domain / subdomain / ip / cidr / icp / keyword"
+        },
+        "value": {
+          "type": "string",
+          "description": "[单条] 公司名或id / 域名 / IP / CIDR / ICP / 关键词"
+        },
+        "reason": {
+          "type": "string",
+          "description": "加入依据(用于审计)，务必填写"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "批量：[{kind, value}]。kind∈company/root_domain/subdomain/ip/cidr/icp/keyword。"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_untested_assets",
+    "description": "查询【本任务及直接关联任务】范围内、还没被事实锚点覆盖的资产（关联范围只读，供你自己判断要不要补测，不代替你决策）。\n可选按资产类型过滤：root_domain/subdomain/service/app/endpoint/ip。\n分页：page 从 1 起、page_size 默认 10。返回 {assets:[{id,type,label}], total, page, page_size}。仅任务上下文可用。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "description": "页码，从 1 起（默认 1）"
+        },
+        "type": {
+          "type": "string",
+          "description": "资产类型过滤（可选）：root_domain/subdomain/service/app/endpoint/ip"
+        },
+        "page_size": {
+          "type": "integer",
+          "description": "每页数量（默认 10）"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_goals",
+    "description": "列出本任务的目标节点及其状态（open/met），用于判断是否达成。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "prove_goal",
+    "description": "当你判断某个发现/事实证明了某个目标达成时调用：把证据节点连到目标节点，并标记目标 met。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "goal_id",
+        "evidence_id"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "为什么这个证据满足该目标"
+        },
+        "goal_id": {
+          "type": "integer",
+          "description": "目标节点 id"
+        },
+        "evidence_id": {
+          "type": "integer",
+          "description": "证明它的发现/事实节点 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "kill_work",
+    "description": "终止一条正在运行的意图(work)。用于叫停跑偏/无意义的探索；被终止的意图标记为 stopped，不再自动重领。先用 get_worker_output 看看它在干嘛再决定。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "intent_id"
+      ],
+      "properties": {
+        "intent_id": {
+          "type": "integer",
+          "description": "要终止的意图 id（= work 句柄）"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_companies",
+    "description": "列出资产库中的【企业/公司】及其资产范围(scope)与已归属资产数。用于查看有哪些公司、拿到 company_id（insert_assets 关联 app、list_assets 按 company_id 过滤时用）。可选 search 按公司名模糊过滤(不区分大小写)，留空返回全部。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "search": {
+          "type": "string",
+          "description": "按公司名模糊过滤(可选，不区分大小写)；留空返回全部"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_tasks",
+    "description": "列出所有任务(id/描述/目标/状态/运行时长/父任务/LLM 配置)，编排 agent 用它掌握全局、看哪些任务卡太久、各自用哪个 LLM。运行时长：运行中=创建→现在，终态=创建→最后活动(秒)。llm_profile：任务 planner/worker 用的配置名，(激活配置)=跟随全局激活。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "pause_task",
+    "description": "暂停指定任务(停止其 planner/worker 循环)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "要暂停的任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "traffic_search",
+    "description": "查询记录代理已抓取的目标流量（必须指定 host；支持裸主机、主机:端口或完整 URL，可再按 URL 子串或正文关键词过滤）。指定端口时只返回该服务的流量，避免同一 IP 的不同端口串包。body_contains 会在已抓取的请求/响应头与正文中做全文搜索，支持任意子串和中文（至少 3 个字符）。仅返回极轻量索引(id/method/url/status/resp_len)，不含响应内容；结果非空后必须用 traffic_get 逐条核实请求/响应，再把确实支持当前漏洞的 ID 交给 bind_finding_traffic。默认只返回 3 条、每页最多 10 条；结果多时用 page 翻页。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "host"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "按主机过滤（必填；如 '107.172.96.177'、'107.172.96.177:8082' 或 'http://107.172.96.177:8082/path'）"
+        },
+        "page": {
+          "type": "integer",
+          "description": "页码，从 0 开始，默认 0（按 ts 倒序分页）"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "每页条数，默认 3，最大 10"
+        },
+        "contains": {
+          "type": "string",
+          "description": "URL 子串过滤（可选，如 'api' / 'login'）"
+        },
+        "body_contains": {
+          "type": "string",
+          "description": "正文全文搜索（可选，至少 3 个字符），匹配请求/响应的头与正文，如 'password' / 'root:x:0' / '内网测试'"
+        }
+      }
+    }
+  },
+  {
+    "key": "traffic_get",
+    "description": "按 id 取一条已抓流量的请求/响应原文（过大会截断）。配合 traffic_search 用，避免重复 curl。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "traffic_search 返回的 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_task_findings",
+    "description": "读指定任务的确认漏洞(含 flag/PoC；每条带 id/task_id/intent_id/vulnclass/severity/摘要/状态)，用 task_id 指定任务。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_task_graph",
+    "description": "读指定任务的探索图总览(同 graph_overview：资产计数/frontier/发现/覆盖等)，用 task_id 指定任务。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "add_task_hint",
+    "description": "给指定任务注入战略提示(该任务的 planner 下轮生成意图时会读到)。\n★优先批量：多条提示放进 hints 数组一次提交（返回 ids 数组，与 hints 等长同序，失败项 id=0）；单条则省略 hints 直接给顶层 text。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "[单条] 提示内容"
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "提示内容"
+              },
+              "asset_ids": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "traffic_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "traffic_id"
+                  ],
+                  "properties": {
+                    "note": {
+                      "type": "string",
+                      "description": "该流量支持什么结论"
+                    },
+                    "role": {
+                      "type": "string",
+                      "description": "baseline / proof / verification / supporting"
+                    },
+                    "traffic_id": {
+                      "type": "string",
+                      "description": "真实流量 ID"
+                    }
+                  }
+                },
+                "description": "可选：已核实且对应本提示中具体漏洞的流量引用，保留顺序；交接后 report_finding 可传 evidence_hint_id 携带这些引用。"
+              }
+            }
+          },
+          "description": "【优先用这个】提示数组，每个元素字段同顶层（text/asset_ids/traffic_refs）。"
+        },
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "锚定的资产 id（可选，0/1/多个；该任务内的资产 id）"
+        },
+        "traffic_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "traffic_id"
+            ],
+            "properties": {
+              "note": {
+                "type": "string",
+                "description": "该流量支持什么结论"
+              },
+              "role": {
+                "type": "string",
+                "description": "baseline / proof / verification / supporting"
+              },
+              "traffic_id": {
+                "type": "string",
+                "description": "真实流量 ID"
+              }
+            }
+          },
+          "description": "可选：已核实且对应本提示中具体漏洞的流量引用，保留顺序；交接后 report_finding 可传 evidence_hint_id 携带这些引用。"
+        }
+      }
+    }
+  },
+  {
+    "key": "create_skill",
+    "description": "创建一个新 skill(写 SKILL.md，agentskills.io 规范)。name 小写字母/数字/连字符。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "name",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "skill 名(小写字母开头，字母/数字/连字符)"
+        },
+        "description": {
+          "type": "string",
+          "description": "skill 描述(必填，说明它做什么/何时用)"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Markdown 正文说明(可选)"
+        }
+      }
+    }
+  },
+  {
+    "key": "update_skill_file",
+    "description": "写/覆盖某个 skill 内的一个文件(默认 SKILL.md)。用于修改技能内容或加脚本/引用。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "name",
+        "content"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "相对路径(可选，默认 SKILL.md，如 scripts/run.py)"
+        },
+        "name": {
+          "type": "string",
+          "description": "skill 名"
+        },
+        "content": {
+          "type": "string",
+          "description": "文件完整内容"
+        }
+      }
+    }
+  },
+  {
+    "key": "create_custom_tool",
+    "description": "【重要】当安装一些平台没有的工具时，调用该工具将安装的工具放入平台中，让平台可以调用！创建一个自定义工具(shell/command/script/http)。shell=bash 环境声明，只需 key+description+agents，无需 exec/schema。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "key",
+        "kind"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "工具 key(小写字母开头，字母/数字/下划线)"
+        },
+        "exec": {
+          "type": "object",
+          "description": "执行规格(shell 类型不需要): command→{command}; script→{code}; http→{method,url,headers,body,proxy,use_recording_proxy}"
+        },
+        "kind": {
+          "type": "string",
+          "description": "shell | command | script(仅Python) | http。shell=bash 环境声明(仅告知模型该工具可在 bash 中直接调用，无需 exec/schema)；其余三种需提供 exec"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "绑定的 agent key(可选)"
+        },
+        "schema": {
+          "type": "object",
+          "description": "参数 JSON-Schema(shell/command/script 可留空; http 必填且需含 properties)"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "是否启用(默认 true)"
+        },
+        "deferred": {
+          "type": "boolean",
+          "description": "是否延迟(shell 类型无效；仅 command/script/http 的不常用工具才开)"
+        },
+        "description": {
+          "type": "string",
+          "description": "发给模型的描述"
+        }
+      }
+    }
+  },
+  {
+    "key": "update_custom_tool",
+    "description": "修改一个已有的自定义工具(按 key)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "key",
+        "kind"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "要修改的自定义工具 key"
+        },
+        "exec": {
+          "type": "object",
+          "description": "执行规格(shell 类型不需要): command→{command}; script→{code}; http→{method,url,headers,body,proxy,use_recording_proxy}"
+        },
+        "kind": {
+          "type": "string",
+          "description": "shell | command | script(仅Python) | http。shell=bash 环境声明(仅告知模型该工具可在 bash 中直接调用，无需 exec/schema)；其余三种需提供 exec"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "绑定的 agent key(可选)"
+        },
+        "schema": {
+          "type": "object",
+          "description": "参数 JSON-Schema(shell/command/script 可留空; http 必填且需含 properties)"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "是否启用(默认 true)"
+        },
+        "deferred": {
+          "type": "boolean",
+          "description": "是否延迟(shell 类型无效；仅 command/script/http 的不常用工具才开)"
+        },
+        "description": {
+          "type": "string",
+          "description": "发给模型的描述"
+        }
+      }
+    }
+  },
+  {
+    "key": "update_finding_report",
+    "description": "为已登记的漏洞写入/更新【详细报告】(Markdown 全文,整段覆盖旧内容)。finding_id 传 report_finding 返回的那个 id(\"finding recorded: <id>\" 里的数字)。报告建议包含:漏洞概述、影响与危害、复现步骤、证据/PoC、修复建议。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "finding_id",
+        "report"
+      ],
+      "properties": {
+        "report": {
+          "type": "string",
+          "description": "详细报告全文,Markdown 格式"
+        },
+        "finding_id": {
+          "type": "integer",
+          "description": "目标漏洞 id(report_finding 返回的 id)"
+        },
+        "evidence_version": {
+          "type": "integer",
+          "description": "get_finding_traffic 返回的证据 version；用于防止报告覆盖新的证据变更"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_llm_profiles",
+    "description": "列出可用的 LLM 配置(profile)：id、名称、模型、格式、是否为当前激活配置。用 id 给 spawn_task 的 llm_profile_id 参数指定子任务专属 LLM（如侦察用便宜模型、利用用强模型）。不含 API Key。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "spawn_task",
+    "description": "新建一个子任务并启动探索引擎，返回 task_id。用于把一件事(如一道题/一个目标)派成独立任务。parent_ref 可选：填当前编排关联的父任务 id 做父子关联。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "description",
+        "goal"
+      ],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "description": "任务目标(要达成什么)"
+        },
+        "parent_ref": {
+          "type": "string",
+          "description": "可选：父任务 id(做父子关联)"
+        },
+        "description": {
+          "type": "string",
+          "description": "任务描述(简短标题)"
+        },
+        "llm_profile_id": {
+          "type": "integer",
+          "description": "可选：指定本子任务 planner/worker 用的 LLM 配置 id(见 list_llm_profiles)；留空则继承父任务、再回退全局激活配置"
+        },
+        "source_task_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "可选：只读继承的来源任务 id 列表(最多 8 个)。子任务可只读引用这些任务已探明的资产/结论作为起点；与 parent_ref 的纯父子指针不同，这是内容继承。"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "可选：任务级超时(秒)。到点后触发优雅收尾并进入 timeout 终态；留空或 0 = 不限时"
+        },
+        "seed_first_intent": {
+          "type": "boolean",
+          "description": "可选：对于简单任务可开启，创建时直接下发一条种子意图(内容=描述+目标)让 worker 免等首轮 planner 直接开跑测试；默认 false(走标准先规划再执行)。"
+        },
+        "plan_heartbeat_seconds": {
+          "type": "integer",
+          "description": "可选：planner 心跳触发间隔(秒)。距上轮规划结束/任务开始满该值且期间无触发 → 触发一轮规划(兜底死锁 + 唤醒去监督飞行中的 worker)。留空或 0 = 默认 600(10min)；"
+        }
+      }
+    }
+  },
+  {
+    "key": "update_mcp",
+    "description": "修改一个已有的 MCP 服务器(按 id)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "transport"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "要修改的 MCP 服务器 id"
+        },
+        "env": {
+          "type": "object",
+          "description": "环境变量 {KEY:VALUE}"
+        },
+        "url": {
+          "type": "string",
+          "description": "http/sse 的 URL"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "命令参数数组"
+        },
+        "name": {
+          "type": "string",
+          "description": "MCP 服务器名"
+        },
+        "command": {
+          "type": "string",
+          "description": "stdio 的启动命令(如 npx)"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "是否启用(默认 true)"
+        },
+        "insecure": {
+          "type": "boolean",
+          "description": "http: 跳过 TLS 证书校验(自签证书时置 true, 默认 false)"
+        },
+        "transport": {
+          "type": "string",
+          "description": "stdio | http / sse"
+        }
+      }
+    }
+  },
+  {
+    "key": "delete_assets_by_host",
+    "description": "按 host 精确删除资产：删掉该 host 的域名/子域名，以及其下的服务(service)、接口(endpoint)。\nhost 完全匹配(小写、去空格)，不是模糊/通配。\n传根域名(如 example.com)会连带删除它的子域名及其服务/接口；传子域名(如 a.example.com)或 IP 只删该 host 自身及其服务/接口。\n⚠️ 硬删除、作用于全局资产库(跨任务共享)、不可撤销。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "host"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "要删除的 host：域名/子域名/IP。完全匹配，如 example.com 或 a.example.com 或 1.2.3.4"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_task_node_detail",
+    "description": "读指定任务里某个探索图节点的完整内容(发现/事实/意图/目标：摘要 + 详情/证据/PoC)。id 为探索节点 id(如 report_finding 返回、或 list_task_findings 里的 id)。写漏洞报告前用它取该漏洞的完整证据。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "探索图节点 id(非资产 id)"
+        },
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_task_worker_trace",
+    "description": "看指定任务里某个 work(意图)的执行过程：get_task_worker_trace(task_id, intent_id) 看步骤摘要；再带 step_ids=[...] 取那几步完整内容(一次最多 5 个,多传只返回前 5 个)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "intent_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        },
+        "step_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "可选：要取完整内容的步骤 id(一次最多 5 个,多传只返回前 5 个,其余在 omitted_step_ids 里列出)"
+        },
+        "intent_id": {
+          "type": "integer",
+          "description": "意图 id(该任务里的 work)"
+        }
+      }
+    }
+  },
+  {
+    "key": "search_task_worker_traces",
+    "description": "在指定任务里按关键字搜索所有 work 的执行过程(返回命中步骤摘要 + intent_id)。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "q"
+      ],
+      "properties": {
+        "q": {
+          "type": "string",
+          "description": "搜索关键字"
+        },
+        "task_id": {
+          "type": "string",
+          "description": "任务 id"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_finding_traffic",
+    "description": "读取漏洞已绑定的真实流量证据，不依赖捕获开关。finding_id 使用 report_finding JSON 返回的独立漏洞记录 ID（不是第一行的探索节点 ID）。先不传 binding_id 获取清单及 version；空清单是正常情况，TCP 等非 HTTP 漏洞或未采集时仍可依据文字/命令证据编写报告，不强制绑定。有绑定时按 binding_id、side(request/response)、offset 分段读取正文。写报告时将读取的 version 作为 evidence_version 传给 update_finding_report，后者 finding_id 仍使用探索节点 ID。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "finding_id"
+      ],
+      "properties": {
+        "side": {
+          "type": "string",
+          "description": "request 或 response，默认 response"
+        },
+        "length": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "binding_id": {
+          "type": "string",
+          "description": "清单里的绑定 ID，省略则返回清单"
+        },
+        "finding_id": {
+          "type": "string",
+          "description": "独立漏洞记录 ID"
+        }
+      }
+    }
+  },
+  {
+    "key": "create_mcp",
+    "description": "创建一个 MCP 服务器(stdio/http/sse)。创建后其工具需按 agent 可见性授权。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "name",
+        "transport"
+      ],
+      "properties": {
+        "env": {
+          "type": "object",
+          "description": "环境变量 {KEY:VALUE}"
+        },
+        "url": {
+          "type": "string",
+          "description": "http/sse 的 URL"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "命令参数数组"
+        },
+        "name": {
+          "type": "string",
+          "description": "MCP 服务器名"
+        },
+        "command": {
+          "type": "string",
+          "description": "stdio 的启动命令(如 npx)"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "是否启用(默认 true)"
+        },
+        "insecure": {
+          "type": "boolean",
+          "description": "http: 跳过 TLS 证书校验(自签证书时置 true, 默认 false)"
+        },
+        "transport": {
+          "type": "string",
+          "description": "stdio | http / sse"
+        }
+      }
+    }
+  },
+  {
+    "key": "list_facts",
+    "description": "分页列本任务及直接关联任务的【探索事实/结论】，最新在前(紧凑：id+摘要+状态，摘要过长会截断，全文用 node_detail(id))。参数均可选：limit(默认 20，上限 100)、before(游标，传上一页返回的 next_before 取更旧的一页；省略/0=最新一页)、q(按摘要关键词过滤)。返回 {facts, total, has_more, next_before}：total 是过滤后的总数，has_more=true 时用 next_before 继续翻页。关联任务条目带 source_task_id/inherited=true 且只读。漏洞看 list_findings。",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "q": {
+          "type": "string",
+          "description": "按事实摘要关键词过滤（不区分大小写）；省略 = 不过滤"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "返回条数，默认 20，上限 100"
+        },
+        "before": {
+          "type": "integer",
+          "description": "分页游标：只返回 id 小于该值的更旧事实；省略或 0 = 最新一页"
+        }
+      }
+    }
+  },
+  {
+    "key": "goal_met",
+    "description": "【立即结束整个任务】——仅当你确认任务的【全部目标都已真正达成、整体收官】时才调（注意是任务【整体】完成；仅仅达成了其中某一个目标/某一个 flag/某一个漏洞【不算】——那种情况用 prove_goal 标记该目标即可）。⚠️它不是用来“结束本轮规划”的：本轮没有新意图要派、或在等 worker 产出，都【直接结束本轮即可，不要调本工具】（0 个意图是完全正常的）。正常判定优先用 prove_goal 逐个证明目标；goal_met 只是绕过逐个证明、直接从全局收官的手段。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "reason"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "达成理由（必须是目标真正达成的证据，不能是“本轮无新方向”这类结束本轮的理由）"
+        }
+      }
+    }
+  },
+  {
+    "key": "bind_finding_traffic",
+    "description": "为已登记漏洞补绑经核实的真实 HTTP 流量。finding_id 使用独立漏洞记录 ID；不要传探索节点 ID。同批引用全部成功或全部失败，重复引用不覆盖已有说明。补绑会使已有报告标记待更新；不要为补包重新探测或重复创建漏洞。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "finding_id",
+        "traffic_refs"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "description": "独立漏洞记录 ID，从 list_task_findings / get_task_node_detail 的 finding_id 字段读取"
+        },
+        "traffic_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "traffic_id"
+            ],
+            "properties": {
+              "note": {
+                "type": "string",
+                "description": "该流量支持什么结论"
+              },
+              "role": {
+                "type": "string",
+                "description": "baseline / proof / verification / supporting"
+              },
+              "traffic_id": {
+                "type": "string",
+                "description": "真实流量 ID"
+              }
+            }
+          },
+          "description": "可选：已核实且对应本提示中具体漏洞的流量引用，保留顺序；交接后 report_finding 可传 evidence_hint_id 携带这些引用。"
+        }
+      }
+    }
+  },
+  {
+    "key": "report_finding",
+    "description": "记录确认的漏洞，用 evidence 提供命令输出、日志等可验证证据。任务上下文传当前 intent_id。返回的 finding_id 是独立漏洞记录 ID，finding_node_id 是探索节点 ID（第一行保留该节点编号）。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "vulnclass",
+        "severity",
+        "summary"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "漏洞名称"
+        },
+        "summary": {
+          "type": "string",
+          "description": "发现摘要"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "证据/PoC 文本"
+        },
+        "severity": {
+          "type": "string",
+          "description": "critical|high|medium|low"
+        },
+        "asset_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "受影响资产 id"
+        },
+        "intent_id": {
+          "type": "integer",
+          "description": "当前任务的意图 id"
+        },
+        "vulnclass": {
+          "type": "string",
+          "description": "漏洞类别"
+        },
+        "traffic_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "traffic_id"
+            ],
+            "properties": {
+              "note": {
+                "type": "string",
+                "description": "该流量如何支持漏洞结论"
+              },
+              "role": {
+                "enum": [
+                  "baseline",
+                  "proof",
+                  "verification",
+                  "supporting"
+                ],
+                "type": "string"
+              },
+              "traffic_id": {
+                "type": "string",
+                "description": "traffic_search 返回的真实流量 ID"
+              }
+            }
+          },
+          "description": "可选；HTTP/HTTPS 漏洞先检索并逐条核实请求/响应确实支持漏洞结论，再按复现顺序填写真实 ID。TCP 等非 HTTP 漏洞、未采集或找不到确切记录时省略或传 []，不阻止上报；可在 evidence 说明原因并提供其他可验证证据。不要猜测 ID、按域名/时间推定关联或仅为补包重复探测。用途 baseline 正常对照 / proof 漏洞证明 / verification 补充验证 / supporting 辅助证据。"
+        },
+        "evidence_hint_id": {
+          "type": "integer",
+          "description": "可选：本任务中对应此漏洞的提示节点 ID，自动携带其结构化 traffic_refs；不能引用继承提示或其他漏洞的提示"
+        }
+      }
+    }
+  },
+  {
+    "key": "traffic_blob",
+    "description": "分段读取超大请求/响应体的原文。traffic_get 里显示为 '…[truncated] @blob sha256:<hash>' 的部分即存放于此，把该 hash 传进来即可取完整内容。单次最多返回 8KB，用 offset 继续往后读（返回结果会给出总长度）。适合翻阅备份文件、源码泄露、大 JSON 导出等超过内联阈值的响应。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "hash"
+      ],
+      "properties": {
+        "hash": {
+          "type": "string",
+          "description": "traffic_get 中 @blob sha256: 后面的 64 位十六进制值"
+        },
+        "length": {
+          "type": "integer",
+          "description": "本次读取字节数，默认且最大 8192"
+        },
+        "offset": {
+          "type": "integer",
+          "description": "起始字节偏移，默认 0"
+        }
+      }
+    }
+  },
+  {
+    "key": "get_finding_retest_context",
+    "description": "读取当前复测会话关联的漏洞证据快照、复测状态、补充说明与当前任务约束。无参数，只能读取本会话。",
+    "schema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "key": "record_finding_retest_result",
+    "description": "为当前复测会话保存唯一结论；原漏洞证据与报告保持不变。会话成功结束且结论为 fixed 时，系统自动将漏洞状态改为已修复；其他结论保留原状态。必须提供本次实际检查的证据，无法确认时写明阻塞原因。",
+    "schema": {
+      "type": "object",
+      "required": [
+        "verdict",
+        "summary",
+        "evidence"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "本次复测结论摘要"
+        },
+        "verdict": {
+          "enum": [
+            "reproduced",
+            "fixed",
+            "inconclusive"
+          ],
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Markdown：本次实际步骤、观察、对照、结论依据；无法确认则列出已检查内容和阻塞原因"
+        }
+      }
+    }
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "note": "[Built-in] Government websites (.gov)",
+    "kind": "fuzzy_domain",
+    "pattern": ".gov"
+  },
+  {
+    "note": "[Built-in] Government websites (.gov.cn)",
+    "kind": "fuzzy_domain",
+    "pattern": ".gov.cn"
+  },
+  {
+    "note": "[Built-in] Educational websites (.edu)",
+    "kind": "fuzzy_domain",
+    "pattern": ".edu"
+  },
+  {
+    "note": "[Built-in] Educational websites (.edu.cn)",
+    "kind": "fuzzy_domain",
+    "pattern": ".edu.cn"
+  }
+]

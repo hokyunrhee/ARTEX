@@ -32,6 +32,8 @@ const workerColors = [
   "bg-pink-600",
   "bg-orange-600",
 ];
+const COMMAND_LABEL = "Command";
+
 function workerColor(name: string): string {
   if (name === "planner") return "bg-amber-600"; // the intent generator, distinct
   if (name === "mainagent") return "bg-primary";
@@ -198,7 +200,7 @@ function InterceptCard({
   }, [step.summary]);
 
   const toolName = React.useMemo(() => {
-    const m = /工具\s+(\S+)\s+请求/.exec(step.summary);
+    const m = /Tool\s+(\S+)\s+requests approval/.exec(step.summary) ?? /工具\s+(\S+)\s+请求/.exec(step.summary);
     return m ? m[1] : step.summary;
   }, [step.summary]);
 
@@ -391,7 +393,7 @@ function ToolBlock({
     if (!open || loadedKey.current === detailKey) return;
     let live = true;
     const segs: { label: string; seq: number }[] = [];
-    if (use) segs.push({ label: "命令", seq: use.seq });
+    if (use) segs.push({ label: COMMAND_LABEL, seq: use.seq });
     if (result) segs.push({ label: "输出" + (result.is_error ? " ✕" : " ✓"), seq: result.seq });
     void Promise.all(
       segs.map((x) =>
@@ -403,7 +405,7 @@ function ToolBlock({
       if (!live) return;
       setDetail(
         segs
-          .map((x, i) => `【${x.label}】\n${x.label === "命令" ? toolInputText(toolName, parts[i]) : parts[i]}`)
+          .map((x, i) => `【${x.label}】\n${x.label === COMMAND_LABEL ? toolInputText(toolName, parts[i]) : parts[i]}`)
           .join("\n\n"),
       );
       loadedKey.current = detailKey;

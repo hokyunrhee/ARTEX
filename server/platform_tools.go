@@ -97,7 +97,7 @@ func (s *Server) toolCreateSkill() actool.CoreTool {
 			}
 			path := filepath.Join(s.skillDir, a.Name)
 			if _, err := os.Stat(path); err == nil {
-				return actool.Errorf("skill 已存在: " + a.Name), nil
+				return actool.Errorf("Skill already exists: " + a.Name), nil
 			}
 			if err := os.MkdirAll(path, 0o755); err != nil {
 				return actool.Errorf(err.Error()), nil

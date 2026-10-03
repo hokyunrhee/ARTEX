@@ -1,0 +1,142 @@
+[
+  {
+    "name": "[Built-in] Forced recursive deletion with rm -rf",
+    "message": "Forced recursive deletion (rm -rf / rm --recursive) is prohibited; it may permanently damage the system or target environment",
+    "pattern": "(?i)\\brm\\b.{0,80}(?:-[a-z]*r[a-z]*f[a-z]*|-[a-z]*f[a-z]*r[a-z]*|--recursive|--no-preserve-root)",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Deleting critical system directories",
+    "message": "Deleting critical system paths is prohibited",
+    "pattern": "\\brm\\b[^\"'\\n]{0,60}[\"'\\s](/|/etc|/bin|/usr|/boot|/var|/lib|/sys|/proc|/dev|/sbin|/root)",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Disk formatting with mkfs",
+    "message": "Disk formatting (mkfs) is prohibited",
+    "pattern": "\\bmkfs\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Overwriting disk devices with dd",
+    "message": "Using dd to overwrite disk devices is prohibited",
+    "pattern": "\\bdd\\b[^|\\n]{0,100}\\bof=\\s*/dev/[a-zA-Z]",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Fork bomb",
+    "message": "Running a fork bomb is prohibited",
+    "pattern": ":\\(\\)\\s*\\{[^}]*:\\|:",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Shutdown or reboot",
+    "message": "Shutdown and reboot commands are prohibited",
+    "pattern": "\\b(?:shutdown|reboot|halt|poweroff|init\\s+[06])\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Killing all processes",
+    "message": "kill -9 -1 and killall -9 (killing all processes) are prohibited",
+    "pattern": "\\bkill\\s+-9\\s+-1\\b|\\bkillall\\s+-9\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Disk erasure with shred or wipe",
+    "message": "Erasing disk devices with shred/wipe is prohibited",
+    "pattern": "\\b(?:shred|wipe)\\b[^|\\n]{0,80}/dev/[a-zA-Z]",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Flushing firewall rules",
+    "message": "Flushing firewall rules (iptables -F / nft flush) is prohibited",
+    "pattern": "\\biptables\\s+(?:-F|--flush)\\b|\\bnft\\s+flush\\s+ruleset\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] SQL DROP DATABASE / TABLE / SCHEMA",
+    "message": "DROP operations are prohibited; they may irreversibly destroy database objects",
+    "pattern": "(?i)\\bDROP\\s+(?:DATABASE|TABLE|SCHEMA|INDEX|VIEW|TABLESPACE|USER|ROLE)\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] SQL TRUNCATE",
+    "message": "TRUNCATE is prohibited; it may erase every row in a table",
+    "pattern": "(?i)\\bTRUNCATE\\s+(?:TABLE\\s+)?\\w",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] MongoDB drop / dropDatabase",
+    "message": "MongoDB drop operations are prohibited",
+    "pattern": "(?i)\\.(?:dropDatabase|dropCollection|drop)\\s*\\(",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Redis FLUSHALL / FLUSHDB",
+    "message": "Redis FLUSHALL / FLUSHDB is prohibited; it may erase all cached data",
+    "pattern": "(?i)\\b(?:FLUSHALL|FLUSHDB)\\b",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] DELETE requests using curl / wget",
+    "message": "HTTP DELETE requests through curl/wget are prohibited; they may delete target system data",
+    "pattern": "(?i)\\bcurl\\b[^|\\n&;\"]{0,300}(?:-X\\s*DELETE|--request\\s+DELETE|-XDELETE)|\\bwget\\b[^|\\n&;\"]{0,300}--method[=\\s]+DELETE",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Python HTTP client DELETE (requests/httpx/aiohttp)",
+    "message": "Sending DELETE requests with Python HTTP clients is prohibited",
+    "pattern": "(?i)\\b(?:requests|httpx|aiohttp|urllib\\.request)\\.delete\\s*\\(|session\\.delete\\s*\\(|client\\.delete\\s*\\(",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] HTTP DELETE declarations in scripts (JavaScript/general)",
+    "message": "Declaring and sending HTTP DELETE requests in scripts is prohibited",
+    "pattern": "(?i)axios\\.delete\\s*\\(|method\\s*[:=]\\s*['\"]DELETE['\"]",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Bulk clearing or erasure endpoint paths",
+    "message": "Calling bulk clearing or destructive endpoints (/clear /wipe /flush /purge etc.) is prohibited",
+    "pattern": "(?i)/(?:clear|wipe|flush|purge|truncate|drop|destroy|factory[-_]reset|reset[-_]all)(?:[/?#\"'\\s]|$)",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Destructive system commands",
+    "message": "Destructive command rejected (rm -rf /, mkfs, dd, fork bomb, shutdown/reboot, or overwriting disk devices)",
+    "pattern": "(?i)\\b(rm\\s+-rf\\s+/|mkfs|dd\\s+if=|:\\(\\)\\s*\\{|shutdown|reboot|>\\s*/dev/sd)",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Data exfiltration pipe",
+    "message": "Suspected data exfiltration pipe rejected (command output sent externally through curl/wget/nc)",
+    "pattern": "(?i)(curl|wget|nc|ncat)\\b[^|]*\\b(\\|\\s*(curl|wget|nc))",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  },
+  {
+    "name": "[Built-in] Deletion endpoint paths",
+    "message": "Deletion endpoints (/delete /remove /unlink /erase etc.) are prohibited regardless of HTTP method; many applications accept GET/POST for deletion, which still removes real target data",
+    "pattern": "(?i)/(?:(?:delete|remove|unlink|erase|destroy)[-\\w]*|del)(?:[/?#\"'\\s]|$)",
+    "match_target": "tool_input",
+    "match_type": "regex"
+  }
+]

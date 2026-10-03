@@ -1,0 +1,22 @@
+[
+  {
+    "kind": "fuzzy_domain",
+    "pattern": ".gov",
+    "note": "[内置] 政府网站 (.gov)"
+  },
+  {
+    "kind": "fuzzy_domain",
+    "pattern": ".gov.cn",
+    "note": "[内置] 政府网站 (.gov.cn)"
+  },
+  {
+    "kind": "fuzzy_domain",
+    "pattern": ".edu",
+    "note": "[内置] 教育网站 (.edu)"
+  },
+  {
+    "kind": "fuzzy_domain",
+    "pattern": ".edu.cn",
+    "note": "[内置] 教育网站 (.edu.cn)"
+  }
+]

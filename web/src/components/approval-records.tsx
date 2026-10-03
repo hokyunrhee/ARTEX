@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { api } from "@/lib/api";
+import { isModelReason, stripModelReason } from "@/lib/approval-source";
 import type {
   InterceptApprovalFilter,
   InterceptApprovalRow,
@@ -50,7 +51,7 @@ function fmtTime(value?: string) {
 function source(row: InterceptApprovalRow) {
   if (row.decision_source) return row.decision_source;
   if (row.rule_id) return "rule";
-  return row.reason?.startsWith("[模型]") ? "model" : "unknown";
+  return isModelReason(row.reason) ? "model" : "unknown";
 }
 
 function originLabel(row: InterceptApprovalRow) {
@@ -109,7 +110,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function MatchCell({ row, showReason = true }: { row: InterceptApprovalRow; showReason?: boolean }) {
-  const reason = row.reason?.replace(/^\[模型\]\s*/, "");
+  const reason = stripModelReason(row.reason);
   return (
     <div className="flex min-w-0 flex-col gap-1">
       {source(row) === "model" ? (
@@ -370,9 +371,9 @@ export function ApprovalDetail({
             <MatchCell row={current} showReason={false} />
           </div>
           <p className="whitespace-pre-wrap break-words text-sm leading-7 [overflow-wrap:anywhere]">
-            {current.reason?.replace(/^\[模型\]\s*/, "") || "未记录审批理由"}
+            {stripModelReason(current.reason) || "未记录审批理由"}
           </p>
-          {audit?.decision_reason ? <p className="text-sm">{audit.decision_reason}</p> : null}
+          {audit?.decision_reason ? <p className="text-sm">{stripModelReason(audit.decision_reason)}</p> : null}
           {audit?.effective_action ? <p className="text-sm">最终动作：{actionLabels[audit.effective_action]}</p> : null}
           <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-xs">
             <dt className="text-muted-foreground">来源</dt>
@@ -484,7 +485,7 @@ export function ApprovalDetail({
               ) : null}
               <CodeBlock
                 label={`${initialLabel}：${actionLabels[audit.initial_action] ?? audit.initial_action}`}
-                text={audit.initial_reason.replace(/^\[模型\]\s*/, "")}
+                text={stripModelReason(audit.initial_reason)}
               />
               <CodeBlock
                 label="执行输出"

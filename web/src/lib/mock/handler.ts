@@ -1,3 +1,5 @@
+import { ApiError } from "@/lib/api-error";
+import { isModelReason } from "@/lib/approval-source";
 // Mock 路由：把 (method, path) 映射到 lib/mock/data 的静态数据。
 // 未命中的一律返回安全默认（[] / {} / {ok:true}），保证任何页面都不崩。
 // 只在 NEXT_PUBLIC_MOCK=1 时经由 api.ts 的 http() 短路进入这里。
@@ -1084,18 +1086,18 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
   }
   if (seg[0] === "task-archives" && seg.length === 2 && m === "GET") {
     const archive = mockTaskArchives.find((item) => item.id === Number(seg[1]));
-    if (!archive) throw new Error("归档不存在");
+    if (!archive) throw new ApiError("Archive not found", 404);
     return publicMockTaskArchive(archive);
   }
   if (seg[0] === "task-archives" && seg[2] === "restore" && seg.length === 3 && m === "POST") {
     const archive = mockTaskArchives.find((item) => item.id === Number(seg[1]));
-    if (!archive) throw new Error("归档不存在");
+    if (!archive) throw new ApiError("Archive not found", 404);
     mockRestoreArchive(archive);
     return publicMockTaskArchive(archive);
   }
   if (seg[0] === "task-archives" && seg.length === 2 && m === "DELETE") {
     const archive = mockTaskArchives.find((item) => item.id === Number(seg[1]));
-    if (!archive) throw new Error("归档不存在");
+    if (!archive) throw new ApiError("Archive not found", 404);
     mockDeleteArchive(archive);
     return publicMockTaskArchive(archive);
   }
@@ -2301,7 +2303,7 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
   }
   if (path === "/conversations" && m === "POST") {
     const now = new Date().toISOString();
-    const title = String(b.title ?? "").trim() || "新对话";
+    const title = String(b.title ?? "").trim() || "New conversation";
     const conversation: Conversation = {
       id: mockConversations.reduce((max, item) => Math.max(max, item.id), 0) + 1,
       agent_key: String(b.agent_key ?? "mainagent"),
@@ -2433,7 +2435,7 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
     if (decisionSource && !["model", "rule", "unknown"].includes(decisionSource)) throw new Error("无效判定来源");
     const filtered = mockInterceptHistory.filter((row) => {
       const source =
-        row.decision_source || (row.rule_id ? "rule" : row.reason?.startsWith("[模型]") ? "model" : "unknown");
+        row.decision_source || (row.rule_id ? "rule" : isModelReason(row.reason) ? "model" : "unknown");
       return (
         (seg[1] !== "task" || row.task_id === decodeURIComponent(seg[2])) &&
         (!status || row.status === status) &&

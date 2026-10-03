@@ -1,0 +1,12 @@
+[
+  {
+    "key": "reporter",
+    "name": "报告撰写",
+    "description": "漏洞详细报告撰写：发现漏洞时自动触发，查取证据与执行过程后写 Markdown 报告并回写。"
+  },
+  {
+    "key": "retester",
+    "name": "漏洞复测",
+    "description": "从漏洞详情手动启动，读取原证据并保存独立复测结论。"
+  }
+]
