@@ -1,50 +1,50 @@
-# 旁路长对话与上下文预算
+# Long side-question conversations and context budgets
 
-2026-09-11 修复。原实现将请求 JSON 的字符数直接视为 token，并继承主任务的 32K 输出预留，因此 HTML、JS 和工具结果较多时会提前拒绝正常旁路问题。
+Fixed on 2026-09-11. The original implementation treated request-JSON character counts as tokens and inherited the main task's 32K output reservation. Large HTML, JavaScript, and tool results therefore caused valid side questions to be rejected prematurely.
 
-## 开源实现核对
+## Review of open-source implementations
 
-- [Grok CLI 旁路上下文](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/agent/agent.ts#L739)：从最近的用户、助手文本中摘取片段，字符预算约 2000，每条至多截取 400 字符。未在此路径维护连续旁路问答历史。
-- [Grok CLI 独立请求](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/utils/side-question.ts)：独立取消信号；模型支持时输出上限为 2048 tokens；不提供工具。
-- [Grok CLI 主会话压缩](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/agent/compaction.ts)：估算 token、保留近期内容、把新内容更新进旧摘要，并处理跨回合截断。
-- [OpenCode 会话压缩](https://github.com/anomalyco/opencode/blob/b3f1a96c6dd7adeb28b36dd11add1998fc84d67b/packages/core/src/session/compaction.ts)：完整请求估算、输出/缓冲预留、近期内容加滚动摘要、无工具摘要请求；该实现默认近期预算 8000、摘要输出上限 4096 tokens。
-- [OpenCode 溢出恢复](https://github.com/anomalyco/opencode/blob/b3f1a96c6dd7adeb28b36dd11add1998fc84d67b/packages/core/src/session/runner/llm.ts)：尚未开始助手输出时才尝试溢出恢复，恢复后的调用不再进入同一溢出恢复路径。
+- [Grok CLI side-question context](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/agent/agent.ts#L739): excerpts recent user/assistant text with an approximately 2000-character budget and at most 400 characters per entry. This path does not maintain continuous side-question history.
+- [Grok CLI independent requests](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/utils/side-question.ts): independent cancellation, a 2048-token output limit when supported, and no tools.
+- [Grok CLI main-session compaction](https://github.com/superagent-ai/grok-cli/blob/fb97af83f06dca873281d60168430f06c8de6324/src/agent/compaction.ts): token estimation, recent-content retention, updates to rolling summaries, and truncation across turns.
+- [OpenCode session compaction](https://github.com/anomalyco/opencode/blob/b3f1a96c6dd7adeb28b36dd11add1998fc84d67b/packages/core/src/session/compaction.ts): full-request estimation, output/buffer reservations, recent content plus rolling summaries, and tool-free summary requests. Defaults are an 8000-token recent-content budget and 4096-token summary output limit.
+- [OpenCode overflow recovery](https://github.com/anomalyco/opencode/blob/b3f1a96c6dd7adeb28b36dd11add1998fc84d67b/packages/core/src/session/runner/llm.ts): recovery is attempted only before assistant output begins, and the recovered call cannot reenter the same recovery path.
 
-ARTEX 借鉴独立输出预算、近期内容与滚动摘要、有限恢复的做法。保持 norma v0.3.6 的结构化消息与工具配对，不照搬 Grok 的文本摘录；不把 OpenCode 的主会话压缩事件写入 ARTEX 主 transcript。
+ARTEX adopts independent output budgets, recent content with rolling summaries, and bounded recovery. It retains norma v0.3.6 structured messages and tool pairing instead of copying Grok's text-excerpt approach, and does not write OpenCode-style main-session compaction events to ARTEX's main transcript.
 
-## 请求预算与执行
+## Request budgets and execution
 
-- 消息沿用 norma 的按内容块 UTF-8 字节估算及 4/3 余量；额外计入系统提示、工具 schema 和消息封装开销。估算不是模型精确 token 计数。
-- 旁路输出默认最多 8192 tokens，也不超过主配置已设的输出上限。可用服务环境变量 `ARTEX_BTW_MAX_OUTPUT_TOKENS` 设置 256–32768 的上限；不会修改产品默认模型或主任务参数。
-- 输入预算为上下文窗口减去输出上限和安全余量；未知窗口使用平台默认 200K。安全余量为窗口的 5%，最小 128、最大 8192 tokens。
-- 成功问答按递增序号每批最多加载 20 组。最多保留 20 组原文，其 token 预算最多为输入预算的 1/4，且不超过 16K。
-- 超额问答更新到滚动摘要。摘要带历史来源与上下文时间；历史助手回答不等同于新的工具证据，冲突时优先依据最新主快照。
-- 主上下文仍过长时，仅摘要副本中的旧消息，近期最多保留 8K tokens；截取点不会拆开工具调用与结果。过大的单组会整体进入摘要。
-- 摘要输入按实际剩余窗口进行 UTF-8 安全分块，输出上限 2048 tokens；空摘要、截断、工具调用或超出摘要预算均不写缓存。单次旁路最多 12 次摘要调用，并受同一 120 秒超时限制；达到上限会明确失败，不无限循环。
-- 若模型首次返回上下文超限且尚未输出文本或工具调用，进一步缩减后最多重试一次；若估算大小没有下降，立即停止恢复。其他模型错误和部分流式输出不触发该恢复。
-- 所有已取得用量，包括摘要、失败尝试和取消时的用量，累加到同一旁路请求。Provider 不返回用量时仍只能记录零，不能把估算伪装成实际用量。
+- Messages use norma's UTF-8-byte estimates per content block with a 4/3 allowance, plus system prompts, tool schemas, and message-envelope overhead. These are estimates, not exact model token counts.
+- Side-question output defaults to at most 8192 tokens and never exceeds an explicitly configured main-model output limit. Set `ARTEX_BTW_MAX_OUTPUT_TOKENS` to a limit from 256 to 32768. This does not change the product's default model or main-task parameters.
+- Input budget is the context window minus output and safety reservations. Unknown windows use the platform's 200K default. The safety margin is 5% of the window, bounded from 128 to 8192 tokens.
+- Successful pairs load in increasing ordinal order, at most 20 per batch. Keep no more than 20 original pairs, with a token budget no greater than one quarter of the input budget and at most 16K.
+- Older pairs update a rolling summary that records history provenance and context time. Historical assistant answers are not new tool evidence; the latest main snapshot wins on conflicts.
+- If the main context remains too large, summarize only older messages in its copy and retain up to 8K recent tokens. Boundaries never split tool calls from results. An oversized single group is summarized as a whole.
+- Summary inputs are divided at UTF-8-safe boundaries according to actual remaining window capacity, with at most 2048 output tokens. Empty, truncated, tool-calling, or over-budget summaries are not cached. Each side question permits at most 12 summary calls under the same 120-second timeout; reaching the limit fails explicitly rather than looping indefinitely.
+- If the first model call reports context overflow before emitting text or tool calls, reduce context further and retry at most once. Stop recovery immediately if the estimate does not decrease. Other errors and partial streamed output do not trigger this recovery.
+- Accumulate all returned usage, including summaries, failed attempts, and cancellation, on the same request. If the provider returns no usage, only zero can be recorded; estimates must not be presented as actual usage.
 
-## 持久化与界面
+## Persistence and interface
 
-`side_question_sessions.memory` 保存旧问答摘要、覆盖的 ordinal，以及按快照身份缓存的主上下文摘要。`side_question_requests.context_info` 保存准备阶段、实际回放组数、摘要使用情况和预算估算。
+`side_question_sessions.memory` stores older-pair summaries, the covered ordinal, and main-context summaries cached by snapshot identity. `side_question_requests.context_info` stores preparation stage, actual replay count, summary usage, and budget estimates.
 
-摘要只在原请求仍运行且清理版本匹配时保存；清空同时清除缓存，迟到写入不会恢复已清理数据。新快照不复用旧快照摘要。摘要字段随 v3 任务归档保存；恢复旧 v3 缺失字段时补空对象，v1/v2 继续兼容。
+Save summaries only while the original request remains active and its clear generation matches. Clearing also removes caches, and late writes cannot restore cleared data. New snapshots do not reuse old snapshot summaries. Summary fields are included in v3 task archives; old v3 archives missing them restore empty objects, and v1/v2 remain compatible.
 
-POST 先接纳并返回请求，准备与压缩在后台执行，不持有准入锁或数据库事务。SSE/历史显示准备、整理问答、压缩副本、回答阶段；压缩失败作为该旁路请求的失败终态保存。前端保留错误并恢复本次失败问题的草稿，不用悬浮通知遮挡输入框；历史轮询不再清掉提交错误。
+POST admits and returns the request before background preparation and compaction, without holding admission locks or database transactions. SSE/history shows Preparing, Summarizing questions, Compacting context copy, and Answering stages. Compaction failure is saved as the request's failed terminal state. The frontend retains the error and restores the failed question draft without a toast obscuring the input; history polling no longer clears submission errors.
 
-## 验证记录
+## Validation record
 
-- 19/20/21/50 组回放、跨 20 组旧结论保留、摘要缓存重启复用：自动化通过。
-- 超长中文回答和代码上下文、分块请求预算、工具配对、快照不变、新快照缓存失效：自动化通过。
-- 摘要失败/取消/截断/超长/工具返回、清空竞争、调用上限、仅一次溢出恢复及部分流不重试：自动化通过。
-- 独立 PostgreSQL 的分页、重启、v1/v2/v3 归档、摘要缓存与预算元数据归档恢复、旧 v3 缺少新字段、20 个父会话共享四个并发名额：通过。
-- Go 候选服务构建、前端 TypeScript 检查、修改组件的 Biome 检查，以及独立目录中的 Next.js 生产构建：通过。
-- 内置浏览器使用独立 UI 夹具，在 1280×720 和 390×844 验证整理阶段、摘要范围提示、失败后草稿恢复、无悬浮错误通知、无横向溢出和控制台无错误。临时夹具已移除。
-- 只读回放本机现有 Worker 快照，新预算检查通过；例如 Worker #3 的 293085 字符快照不再被本地字符计数误判拒绝。此项没有外部模型调用。
-- 本次将私有 Worker 快照发送到 Grok 的真实对话测试被自动审批审查拒绝，未执行，不作为通过项。
-- 2026-09-11 00:37 按用户要求重启本机后端，沿用原数据库、数据目录和登录配置。运行文件与候选二进制 SHA-256 一致；后端及前端代理的 `/api/health` 均返回正常。
+- Automated tests passed for replaying 19/20/21/50 pairs, retaining older conclusions across the 20-pair boundary, and reusing summary caches after restart.
+- Automated tests passed for long Chinese answers and code context, chunk budgets, tool pairing, immutable snapshots, and cache invalidation for new snapshots.
+- Automated tests passed for summary failure/cancellation/truncation/oversized output/tool calls, clear races, call limits, single overflow recovery, and no retry after partial streams.
+- Independent PostgreSQL tests passed for pagination, restart, v1/v2/v3 archives, summary-cache and budget-metadata restoration, old v3 archives without new fields, and 20 parents sharing four concurrency slots.
+- Candidate Go service build, frontend TypeScript checks, Biome checks on modified components, and an isolated Next.js production build passed.
+- The in-app browser used independent UI fixtures at 1280 x 720 and 390 x 844 to verify preparation stages, summary-scope notices, draft restoration after failure, no floating error toast, no horizontal overflow, and no console errors. Temporary fixtures were removed.
+- Read-only replay of existing local worker snapshots passed the new budget checks. For example, Worker #3's 293085-character snapshot was no longer incorrectly rejected by local character counting. No external model call was made for this check.
+- Automatic approval review rejected the live Grok test that would send private worker snapshots; it was not executed and is not reported as passed.
+- At the user's request, the local backend restarted on 2026-09-11 at 00:37 with the original database, data directory, and login configuration. The running executable matched the candidate SHA-256, and both backend and frontend-proxy `/api/health` checks succeeded.
 
-验证命令（仅使用独立测试库）：
+Validation commands, using separate test databases only:
 
 ```sh
 go test -race ./sidequestion ./db ./server -run 'TestSide|TestCheckpoint|TestSnapshot|TestBuildRequest|TestService|TestMainSide|TestTaskArchive' -count=1
@@ -53,4 +53,4 @@ npx tsc --noEmit
 npm run build -- --webpack
 ```
 
-前端生产构建使用独立副本，避免覆盖当前预览的 `.next`。候选服务位于 `/private/tmp/artex-btw-budget-candidate`，已复制到 `/private/tmp/artex-btw-preview/artex` 并启动；原二进制备份为同目录下的 `artex.before-context-budget`。
+The production frontend build used a separate copy to avoid overwriting the active preview's `.next`. The candidate service at `/private/tmp/artex-btw-budget-candidate` was copied to `/private/tmp/artex-btw-preview/artex` and started; the old binary was backed up beside it as `artex.before-context-budget`.
