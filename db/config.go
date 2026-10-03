@@ -753,7 +753,7 @@ func (d *DB) SeedPromptIfEmpty(agentID int64, tmpl string) error {
 }
 
 // ResetPromptToDefault appends the code-default template as a new version and
-// points current at it — the explicit "Restore built-in default" action.
+// points current at it - the explicit "Restore built-in default" action.
 func (d *DB) ResetPromptToDefault(agentID int64, tmpl string) (int, error) {
 	return d.SavePrompt(agentID, tmpl, "Restore built-in default", "system")
 }

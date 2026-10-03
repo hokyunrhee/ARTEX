@@ -79,7 +79,7 @@ CREATE INDEX IF NOT EXISTS idx_blob_refs_ex ON blob_refs(exchange_id);
 // must degrade to "no full-text search" rather than take the whole recorder down.
 // trigram (not the default unicode61) is required for two reasons this subsystem
 // depends on: it matches arbitrary substrings — "ssw0r" finds "P@ssw0rd" — and it
-// handles CJK, which unicode61 does not tokenize. Contentless (content=”) keeps
+// handles CJK, which unicode61 does not tokenize. Contentless indexing keeps
 // only the index, since the text itself lives in exchange_bodies; contentless_delete
 // lets rows be deleted without replaying the original text back in.
 const ftsSchema = `CREATE VIRTUAL TABLE IF NOT EXISTS ex_fts USING fts5(
