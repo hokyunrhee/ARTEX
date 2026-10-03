@@ -1,18 +1,25 @@
 "use client";
 
 import * as React from "react";
+
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import type { Activity, InterceptExecution } from "@/lib/types";
 
+export interface ApprovalFocusState {
+  id: number;
+  source?: InterceptExecution;
+  error?: string;
+  loading: boolean;
+}
+
 // Resolve one exact persisted call, independently of transcript pagination.
-export function useApprovalFocus({ taskId, conversationId }: { taskId?: string; conversationId?: number }) {
-  const [state, setState] = React.useState<{
-    id: number;
-    source?: InterceptExecution;
-    error?: string;
-    loading: boolean;
-  } | null>(null);
+export function useApprovalFocus({ taskId, conversationId }: { taskId?: string; conversationId?: number }): {
+  state: ApprovalFocusState | null;
+  close: () => void;
+  retry: () => void;
+} {
+  const [state, setState] = React.useState<ApprovalFocusState | null>(null);
   const [revision, setRevision] = React.useState(0);
   // biome-ignore lint/correctness/useExhaustiveDependencies: revision is the explicit retry trigger.
   React.useEffect(() => {
@@ -34,12 +41,13 @@ export function useApprovalFocus({ taskId, conversationId }: { taskId?: string; 
             ? source.conversation_id !== conversationId
             : source.task_id !== taskId || source.conversation_id != null
         ) {
-          throw new Error("审批来源与当前会话不一致");
+          throw new Error("The approval belongs to a different conversation");
         }
         setState({ id, source, loading: false });
       })
       .catch((e) => {
-        if (!cancelled) setState({ id, error: (e as Error).message || "无法定位原始执行", loading: false });
+        if (!cancelled)
+          setState({ id, error: (e as Error).message || "Cannot locate the original execution", loading: false });
       });
     return () => {
       cancelled = true;
@@ -78,13 +86,15 @@ export function useApprovalHistory(
         const page = await loadPage(before);
         if (cancelled) return;
         if (!page.items.length || (before > 0 && page.items[0].seq >= before)) {
-          throw new Error("会话中未找到对应工具调用，记录可能已删除");
+          throw new Error(
+            "The matching tool call was not found in this conversation. The record may have been deleted.",
+          );
         }
         mergePage(page);
         current = page.items;
         before = current[0].seq;
         if (!page.hasMore && !current.some((a) => a.seq === source.seq)) {
-          throw new Error("会话中未找到对应工具调用");
+          throw new Error("The matching tool call was not found in this conversation");
         }
       }
       if (!cancelled) setResult({ source });
@@ -111,26 +121,26 @@ export function ApprovalExecutionFocus({
   const { state } = focus;
   if (!state) return null;
   const error = state.error || history.error;
+  let status = `Locating approval #${state.id} in the conversation...`;
+  if (error) {
+    status = `Cannot locate execution: ${error}`;
+  } else if (history.ready) {
+    status = `Expanded the tool call for approval #${state.id}`;
+  }
   return (
     <div
       role="status"
       className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-4 py-2 text-xs"
     >
-      <span className={error ? "text-destructive" : "text-muted-foreground"}>
-        {error
-          ? `无法定位：${error}`
-          : history.ready
-            ? `已展开审批 #${state.id} 对应的工具调用`
-            : `正在加载审批 #${state.id} 所在的对话位置…`}
-      </span>
+      <span className={error ? "text-destructive" : "text-muted-foreground"}>{status}</span>
       <div className="flex gap-2">
         {error ? (
           <Button size="sm" variant="outline" onClick={focus.retry}>
-            重试定位
+            Try locating again
           </Button>
         ) : null}
         <Button size="sm" variant="ghost" onClick={focus.close}>
-          取消定位
+          Cancel navigation
         </Button>
       </div>
     </div>

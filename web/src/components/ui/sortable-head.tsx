@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 import type * as React from "react";
+
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { TableHead } from "@/components/ui/table";
 import type { SortDirection } from "@/lib/sort-preference";
@@ -32,11 +33,13 @@ export function SortableHead<Field extends string>({
   let ariaSort: React.AriaAttributes["aria-sort"] = "none";
   if (active) ariaSort = direction === "asc" ? "ascending" : "descending";
 
-  let actionLabel = `按${label}倒序排序`;
-  if (active) actionLabel = `${label}当前${direction === "asc" ? "正序" : "倒序"}，点击切换排序方向`;
+  let actionLabel = `Sort ${label} descending`;
+  if (active)
+    actionLabel = `${label} is sorted ${direction === "asc" ? "ascending" : "descending"}; click to reverse the order`;
 
   let icon = <ArrowUpDownIcon className="size-3.5 opacity-40 transition-opacity group-hover/sort:opacity-100" />;
-  if (active) icon = direction === "asc" ? <ArrowUpIcon className="size-3.5" /> : <ArrowDownIcon className="size-3.5" />;
+  if (active)
+    icon = direction === "asc" ? <ArrowUpIcon className="size-3.5" /> : <ArrowDownIcon className="size-3.5" />;
 
   return (
     <TableHead className={className} aria-sort={ariaSort}>

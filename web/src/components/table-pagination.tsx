@@ -18,14 +18,14 @@ interface TablePaginationProps {
 }
 
 // pageWindows returns the sequence of page numbers / ellipsis to render.
-function pageWindows(page: number, total: number): (number | "...")[] {
+function pageWindows(page: number, total: number): (number | "start-ellipsis" | "end-ellipsis")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  const out: (number | "...")[] = [1];
-  if (page > 3) out.push("...");
+  const out: (number | "start-ellipsis" | "end-ellipsis")[] = [1];
+  if (page > 3) out.push("start-ellipsis");
   const lo = Math.max(2, page - 1);
   const hi = Math.min(total - 1, page + 1);
   for (let i = lo; i <= hi; i++) out.push(i);
-  if (page < total - 2) out.push("...");
+  if (page < total - 2) out.push("end-ellipsis");
   out.push(total);
   return out;
 }
@@ -51,7 +51,7 @@ export function TablePagination({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-2 lg:px-6">
-      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-muted-foreground text-xs">
         <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
           <SelectTrigger size="sm" className="h-7 w-16">
             <SelectValue />
@@ -64,13 +64,13 @@ export function TablePagination({
             ))}
           </SelectContent>
         </Select>
-        <span>条/页</span>
+        <span>per page</span>
         {total > 0 ? (
           <span className="tabular-nums">
-            {from}–{to} / 共 {total} 条
+            {from}-{to} of {total}
           </span>
         ) : (
-          <span>共 0 条</span>
+          <span>0 results</span>
         )}
       </div>
 
@@ -83,14 +83,14 @@ export function TablePagination({
                 size="icon-sm"
                 disabled={safePage === 1}
                 onClick={() => onPageChange(safePage - 1)}
-                aria-label="上一页"
+                aria-label="Previous page"
               >
                 <ChevronLeftIcon className="size-4" />
               </Button>
             </PaginationItem>
-            {pageWindows(safePage, totalPages).map((p, i) =>
-              p === "..." ? (
-                <PaginationItem key={`el-${i}`}>
+            {pageWindows(safePage, totalPages).map((p) =>
+              typeof p === "string" ? (
+                <PaginationItem key={p}>
                   <PaginationEllipsis />
                 </PaginationItem>
               ) : (
@@ -112,7 +112,7 @@ export function TablePagination({
                 size="icon-sm"
                 disabled={safePage === totalPages}
                 onClick={() => onPageChange(safePage + 1)}
-                aria-label="下一页"
+                aria-label="Next page"
               >
                 <ChevronRightIcon className="size-4" />
               </Button>

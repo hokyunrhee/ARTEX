@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { ListTodo } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,11 +30,11 @@ export function TodoPopover({
     setErr("");
     try {
       const detail = await fetchDetail(seq);
-      const start = detail.indexOf("{"); // detail 可能带 "TodoWrite " 前缀
+      const start = detail.indexOf("{"); // detail may include a "TodoWrite " prefix
       const parsed = JSON.parse(start >= 0 ? detail.slice(start) : detail);
       setTodos(Array.isArray(parsed?.todos) ? parsed.todos : []);
     } catch {
-      setErr("解析 Todo 失败");
+      setErr("Could not parse todos");
       setTodos(null);
     } finally {
       setLoading(false);
@@ -42,9 +43,15 @@ export function TodoPopover({
 
   // refetch on each open — todos change as the run progresses.
   React.useEffect(() => {
-    if (open) load();
+    if (open) void load();
   }, [open, load]);
 
+  const occurrences = new Map<string, number>();
+  const keyedTodos = (todos ?? []).map((todo) => {
+    const occurrence = occurrences.get(todo.content) ?? 0;
+    occurrences.set(todo.content, occurrence + 1);
+    return { ...todo, key: `${todo.content}:${occurrence}` };
+  });
   const disabled = seq == null;
   const MARK: Record<string, string> = { pending: "☐", in_progress: "▶", completed: "✔" };
   return (
@@ -53,26 +60,27 @@ export function TodoPopover({
         <button
           type="button"
           disabled={disabled}
-          title={disabled ? "本会话暂无 Todo" : "查看最近 Todo"}
-          className="text-muted-foreground/70 hover:text-primary flex items-center gap-0.5 text-xs disabled:pointer-events-none disabled:opacity-40"
+          title={disabled ? "No todos in this conversation yet" : "View recent todos"}
+          className="flex items-center gap-0.5 text-muted-foreground/70 text-xs hover:text-primary disabled:pointer-events-none disabled:opacity-40"
         >
           <ListTodo className="size-3" />
           Todo
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="max-h-80 w-80 overflow-auto p-2">
-        <p className="text-muted-foreground px-1 pb-1 text-[11px] font-medium">
-          最近 Todo{loading ? " · 加载中…" : ""}
+        <p className="px-1 pb-1 font-medium text-[11px] text-muted-foreground">
+          Recent todos{loading ? " · Loading..." : ""}
         </p>
-        {err && <p className="text-destructive px-1 text-xs">{err}</p>}
-        {todos && todos.length === 0 && !loading && (
-          <p className="text-muted-foreground px-1 text-xs">（空）</p>
-        )}
+        {err && <p className="px-1 text-destructive text-xs">{err}</p>}
+        {todos && todos.length === 0 && !loading && <p className="px-1 text-muted-foreground text-xs">(empty)</p>}
         <ul className="space-y-0.5">
-          {(todos ?? []).map((t, i) => (
+          {keyedTodos.map((t) => (
             <li
-              key={`${i}:${t.content}`}
-              className={cn("flex gap-1.5 px-1 text-xs", t.status === "completed" && "text-muted-foreground line-through")}
+              key={t.key}
+              className={cn(
+                "flex gap-1.5 px-1 text-xs",
+                t.status === "completed" && "text-muted-foreground line-through",
+              )}
             >
               <span className="shrink-0">{MARK[t.status] ?? "☐"}</span>
               <span className="break-words">{t.content}</span>
