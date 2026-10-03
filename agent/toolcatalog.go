@@ -7,59 +7,59 @@ import (
 	actool "github.com/Autumn-27/norma/tool"
 )
 
-// 本文件把「内置工具」从纯代码变成可枚举、可被 DB 覆盖的目录：
-//   - BuiltinToolSeeds()：把三个执行 agent 的内置工具集展开成 seed 记录（key +
-//     描述 + 参数 schema + 默认绑定的 agent），供服务端开机幂等播种进 tools 表。
-//   - ToolResolve 钩子：运行时按 DB 里的 tools 行对已装配的工具做「按 agent 过滤 +
-//     覆盖描述/schema + 注入参数默认值」。key/handler 仍在代码层，DB 只改「散文与默认值」。
-// handler（Call 行为）永远来自代码——DB 改不了它，只能改模型看到的说明与缺省入参。
+// This file turns built-in tools from pure code into an enumerable catalog with DB overrides:
+// - BuiltinToolSeeds() expands the three execution agents' built-in tool sets into seed records (key,
+// description, parameter schema, and default agent bindings) for idempotent server-start seeding into tools.
+// - The ToolResolve hook filters assembled tools by agent at runtime using tools rows,
+// overrides descriptions/schemas, and injects default arguments. Keys/handlers remain in code; the DB changes only prose and defaults.
+// Handlers (Call behavior) always come from code; the DB can only change model-visible descriptions and default arguments.
 
-// ToolSeed 是一个内置工具的可播种快照：key 即 CoreTool.Name()（与 handler 死绑，
-// UI 只读），Desc/Schema 取自代码里的工具定义，Agents 是代码默认把它给了哪些 agent。
+// ToolSeed is a seedable built-in tool snapshot: key is CoreTool.Name(), inseparably bound to the handler
+// and read-only in the UI; Desc/Schema come from code definitions; Agents lists the code's default bindings.
 type ToolSeed struct {
-	Key    string         // = CoreTool.Name()，主键，不可改
-	Desc   string         // 顶层描述（可在 UI 覆盖）
-	Schema map[string]any // 参数 JSON-Schema（结构只读，description/default 可在 UI 改）
-	Agents []string       // 默认绑定的 agent key（worker/planner/mainagent）
+	Key    string         // CoreTool.Name(); immutable primary key
+	Desc   string         // Top-level description, overridable in the UI
+	Schema map[string]any // Parameter JSON Schema; structure read-only, description/default editable in the UI
+	Agents []string       // Default agent keys (worker/planner/mainagent)
 }
 
-// builtinToolsByAgent 用一个「只读空壳」ToolSet（nil stores）构造每个执行 agent 的
-// 领域工具集。工具构造函数只把闭包塞进 Spec、构造期不解引用 store，所以 nil 安全——
-// 这些工具在这里只用来读 Name()/Description()/InputSchema()，绝不 Call。
+// builtinToolsByAgent constructs each execution agent's domain tools using a read-only skeleton ToolSet
+// with nil stores. Constructors only put closures in Spec and never dereference stores during construction,
+// so nil is safe. These tools only expose Name()/Description()/InputSchema() here; Call is never invoked.
 //
-// 刻意【不含】SDK 通用工具 actool.DefaultTools()（Read/Write/Edit/MultiEdit/LS/Glob/
-// Grep/Bash）：它们每个 agent 都固定拥有、没有「绑定到谁」的取舍，且说明大多在 Prompt()
-// 里（本表只覆盖 Description()，会造成半覆盖误导）。不 seed → 无 DB 行 → ToolResolve
-// 原样放行、不覆盖，行为与从前一致。只有 artex 自己的领域工具入表可管。
+// Deliberately excludes SDK general-purpose actool.DefaultTools() (Read/Write/Edit/MultiEdit/LS/Glob/
+// Grep/Bash): every agent always has them, with no binding choices, and most documentation lives in Prompt(),
+// while this table overrides only Description(), causing misleading partial overrides. No seed means no DB row;
+// ToolResolve passes them through unchanged, preserving prior behavior. Only ARTEX domain tools enter the managed table.
 func builtinToolsByAgent() map[string][]actool.CoreTool {
 	ts := NewToolSet(nil, "")
 	return map[string][]actool.CoreTool{
 		"mainagent": ts.MainAgentTools(),
 		"planner":   ts.PlannerTools(),
 		"worker":    ts.WorkerTools(),
-		// goals（目标拆解器）默认绑 set_goals + set_constraints：靠它们把拆出的目标、
-		// 抽出的操作约束写进库。与 mainagent 共用同一受管工具，web 端可改描述/schema、按 agent 勾选。
+		// goals (goal decomposition) binds set_goals + set_constraints by default to persist decomposed goals
+		// and extracted operation constraints. The same managed tools are shared with mainagent; the UI edits descriptions/schemas and agent bindings.
 		"goals": {ts.setGoals(), ts.setConstraints()},
-		// auto 默认绑漏洞上报 + 资产管理工具，其他域工具可在 UI 按需勾选。
-		// 新库由此 seed 写入；老库由 seedAutoDefaultBindings 迁移。
+		// auto defaults to finding reporting and asset management; other domain tools can be enabled per agent in the UI.
+		// Fresh databases receive these seeds; existing databases migrate through seedAutoDefaultBindings.
 		"auto": {ts.addFinding(), ts.insertAssets(), ts.addCompanyScope(), ts.listAssets(), ts.listCompanies()},
-		// pentest（独立渗透 agent）默认绑：查资产 / 插资产 / 报漏洞 / 查漏洞 / 查企业。
-		// 新库由此 seed 写入；老库由 seedPentestDefaultBindings 迁移。
+		// pentest (independent penetration testing) defaults to asset lookup/insertion, finding reporting/lookup, and company lookup.
+		// Fresh databases receive these seeds; existing databases migrate through seedPentestDefaultBindings.
 		"pentest": {ts.listAssets(), ts.insertAssets(), ts.addFinding(), ts.listFindings(), ts.listCompanies()},
 	}
 }
 
-// defaultUnbound：这些 system 工具会照常入目录（web 端可见、可手动按 agent 勾选），但
-// 默认【不绑任何 agent】——ToolResolve 对空绑定的工具对所有 agent 一律丢弃,须显式 opt-in。
-// 之所以仍留在某个 agent 的 base 工具集里(如 goal_met 在 PlannerTools):一是让 seed 能
-// 构造它拿到 desc/schema,二是用户手动绑回后运行时 base 里有它、ToolResolve 才留得住。
+// defaultUnbound tools still enter the system catalog, visible in the UI and manually bindable to agents,
+// but have no default bindings. ToolResolve drops unbound tools for every agent; explicit opt-in is required.
+// They remain in an agent's base tool set (such as goal_met in PlannerTools) so seeding can construct their
+// description/schema and ToolResolve can retain them at runtime if the user manually binds them again.
 //
-// goal_met：绕过逐个 prove_goal、直接从全局宣布【整个任务完成】,权重大且有误判风险,又与
-// 「prove_goal 标记最后一个目标 → 自动收官」重复,故默认不给任何 agent,需要时再手动绑。
+// goal_met bypasses individual prove_goal calls and declares the entire task complete globally. It is powerful and risks false completion,
+// duplicating automatic completion after prove_goal marks the last goal. No agent gets it by default; bind manually when needed.
 var defaultUnbound = map[string]bool{"goal_met": true}
 
-// BuiltinToolSeeds 把各 agent 的内置工具集去重合并成 seed 列表：同名工具（如 list_assets
-// 多个 agent 都有）合成一条，Agents 取并集；defaultUnbound 里的工具则强制绑定为空。
+// BuiltinToolSeeds deduplicates and merges agents' built-in tool sets into seeds. Same-named tools, such as list_assets
+// shared by multiple agents, become one record with the union of Agents; defaultUnbound tools always have empty bindings.
 func BuiltinToolSeeds() []ToolSeed {
 	byAgent := builtinToolsByAgent()
 	order := []string{"mainagent", "goals", "planner", "worker", "auto", "pentest"}
@@ -87,7 +87,7 @@ func BuiltinToolSeeds() []ToolSeed {
 		a := m[k]
 		agents := a.agents
 		if defaultUnbound[k] {
-			agents = []string{} // 入目录、可手动绑，但默认不给任何 agent（存 [] 而非 null，与其它工具一致）
+			agents = []string{} // In the catalog and manually bindable, but not given to any agent by default ([] rather than null, like other tools)
 		}
 		out = append(out, ToolSeed{
 			Key:    k,
@@ -102,7 +102,7 @@ func BuiltinToolSeeds() []ToolSeed {
 // ToolResolve, if set, post-processes an agent's fully-assembled tool list against
 // the DB tools table: it drops tools not bound to this agent (or globally disabled)
 // and wraps the rest so the model sees the DB-overridden description/schema and
-// 缺省入参 get injected. Tools with no matching DB row (MCP/skill/host tools like
+// default arguments get injected. Tools with no matching DB row (MCP/skill/host tools like
 // traffic) pass through untouched. nil = tools unchanged. Wired in server/assembly.go.
 var ToolResolve func(ctx context.Context, agentKey string, tools []actool.CoreTool) []actool.CoreTool
 
@@ -138,7 +138,7 @@ func (o *overriddenTool) Call(ctx context.Context, in json.RawMessage, tc *actoo
 
 // injectDefaults fills scalar parameter defaults declared in the (possibly edited)
 // schema into the input JSON whenever the model omitted the field or left it empty/
-// null. Structure (names/types/required) is untouched — only缺省值 are merged in.
+// null. Structure (names/types/required) is untouched; only default values are merged in.
 func injectDefaults(in json.RawMessage, schema map[string]any) json.RawMessage {
 	defs := scalarDefaults(schema)
 	if len(defs) == 0 {
