@@ -2,14 +2,14 @@
 """
 spider_mpa.py <BASE_URL> <OUTDIR> [--cookie "k=v; k2=v2"] [--max 200] [--depth 4]
 
-参考模板 — 非通用成品。执行前须按目标调整 --exclude、cookie、depth/max 等同域策略。
+Reference template, not a general-purpose finished tool. Adapt --exclude, cookie, depth/max, and same-domain policies to the target.
 
 Fallback for NON-SPA targets (traditional server-rendered MPAs: Django/Rails/PHP/
 JSP, classic admin panels). When there is no JS endpoint bundle, the API surface
 lives in HTML <form action>, <a href>, and inline-JS ajax urls. This BFS-crawls
 the same origin and extracts:
   - forms.txt : METHOD action  [param1, param2, ...]   (the real "endpoints")
-  - links.txt : every same-origin URL reached
+  - links.txt : every same-domain URL reached
   - api_inline.txt : url-ish strings found in inline <script> / onclick (fetch/ajax)
 
 Stdlib only. Same-origin, bounded, polite. Provide --cookie for an authed crawl.
