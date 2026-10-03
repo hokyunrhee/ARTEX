@@ -458,7 +458,7 @@ func (s *Server) getTaskArchive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if item == nil {
-		writeErr(w, 404, "归档不存在")
+		writeErr(w, 404, "archive not found")
 		return
 	}
 	writeJSON(w, 200, item)

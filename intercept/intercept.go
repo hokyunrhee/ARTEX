@@ -477,9 +477,9 @@ func (i *Interceptor) Judge(ctx context.Context, tool string, arguments json.Raw
 	configJSON, _ := json.Marshal(cfg)
 	out.ConfigDigest = digestInput(configJSON)
 	if out.Message == "" {
-		out.Message = "[模型] " + judgeActionLabel(out.Action)
-	} else if !strings.HasPrefix(out.Message, "[模型]") {
-		out.Message = "[模型] " + out.Message
+		out.Message = ModelDecisionPrefix + " " + judgeActionLabel(out.Action)
+	} else if !strings.HasPrefix(out.Message, ModelDecisionPrefix) && !strings.HasPrefix(out.Message, LegacyModelDecisionPrefix) {
+		out.Message = ModelDecisionPrefix + " " + out.Message
 	}
 	if out.Action == "ask" {
 		out.TimeoutEnabled = true
@@ -489,14 +489,25 @@ func (i *Interceptor) Judge(ctx context.Context, tool string, arguments json.Raw
 	return out, true
 }
 
+// ModelDecisionPrefix marks an approval reason produced by the LLM fallback
+// judge (as opposed to a rule hit). It is matched by code and SQL (db/intercept.go,
+// db/schema.sql) to classify the decision source, so it is a stable wire token, not
+// display text. LegacyModelDecisionPrefix is the Chinese token shipped before the
+// English conversion; existing rows, exported archives and stored audit JSON still
+// carry it, so every consumer accepts both prefixes permanently.
+const (
+	ModelDecisionPrefix       = "[model]"
+	LegacyModelDecisionPrefix = "[模型]"
+)
+
 func judgeActionLabel(action string) string {
 	switch action {
 	case "allow":
-		return "放行"
+		return "Allow"
 	case "deny":
-		return "拦截"
+		return "Block"
 	case "ask":
-		return "转人工审批"
+		return "Send for human approval"
 	default:
 		return action
 	}
@@ -609,7 +620,7 @@ func (i *Interceptor) HandleAsk(ctx context.Context, convID int64, dec Decision,
 	})
 	activity := db.Activity{
 		Kind:    "intercept_request",
-		Summary: fmt.Sprintf("工具 %s 请求审批 (#%d)", toolName, pendingID),
+		Summary: fmt.Sprintf("Tool %s requested approval (#%d)", toolName, pendingID),
 		Detail:  string(detail),
 	}
 

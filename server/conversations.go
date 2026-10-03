@@ -23,7 +23,19 @@ const (
 	maxConversationRequestBytes  = 64 << 10
 	maxConversationAgentKeyRunes = 120
 	maxConversationTitleRunes    = 200
+	// defaultConversationTitle is seeded for a new conversation and compared on the
+	// first message to decide whether to auto-rename from the message text.
+	// legacyDefaultConversationTitle is the pre-English-conversion default, still accepted
+	// on read so conversations created before the conversion keep auto-renaming.
+	defaultConversationTitle       = "New conversation"
+	legacyDefaultConversationTitle = "新对话"
 )
+
+// isDefaultConversationTitle reports whether a title is still the unedited default
+// (English or legacy Chinese), i.e. safe to auto-rename from the first message.
+func isDefaultConversationTitle(title string) bool {
+	return title == "" || title == defaultConversationTitle || title == legacyDefaultConversationTitle
+}
 
 func decodeConversationRequest(w http.ResponseWriter, r *http.Request, value any) bool {
 	r.Body = http.MaxBytesReader(w, r.Body, maxConversationRequestBytes)
@@ -109,7 +121,7 @@ func (s *Server) pgCreateConversation(w http.ResponseWriter, r *http.Request) {
 	}
 	title := strings.TrimSpace(req.Title)
 	if title == "" {
-		title = "新对话"
+		title = defaultConversationTitle
 	}
 	if utf8.RuneCountInString(title) > maxConversationTitleRunes {
 		writeErr(w, 400, fmt.Sprintf("标题最多 %d 个字符", maxConversationTitleRunes))
@@ -440,10 +452,10 @@ func (s *Server) pgSendConversationMessage(w http.ResponseWriter, r *http.Reques
 	if _, err := pg.AppendConvActivity(c.ID, ua); err != nil {
 		log.Printf("[conv %d] append user msg failed: %v", c.ID, err)
 	}
-	if c.Title == "" || c.Title == "新对话" {
+	if isDefaultConversationTitle(c.Title) {
 		title := firstLine(msg, 40)
 		if title == "" {
-			title = "附件消息"
+			title = "Attachment message"
 		}
 		_ = pg.RenameConversation(c.ID, title)
 	}
@@ -733,16 +745,16 @@ func mergeTriggeredRuns(items []triggeredRun) triggeredRun {
 	}
 	first := items[0]
 	var b strings.Builder
-	fmt.Fprintf(&b, "【本会话合并了任务 #%d 的 %d 条触发事件，请一并处理】\n", first.taskID, len(items))
+	fmt.Fprintf(&b, "[This conversation merged %d trigger events for task #%d; please handle them together]\n", len(items), first.taskID)
 	if h := taskContextHeader(first.taskID, first.taskDesc, first.taskGoal); h != "" {
 		fmt.Fprintf(&b, "%s\n", h) // same task → task context appears once
 	}
 	for i, it := range items {
-		fmt.Fprintf(&b, "\n── 触发 %d ──\n%s\n", i+1, it.message)
+		fmt.Fprintf(&b, "\n── Trigger %d ──\n%s\n", i+1, it.message)
 	}
 	return triggeredRun{
 		agentKey:  first.agentKey,
-		title:     fmt.Sprintf("合并触发 · task#%d · %d 条", first.taskID, len(items)),
+		title:     fmt.Sprintf("Merged triggers · task#%d · %d", first.taskID, len(items)),
 		message:   b.String(),
 		taskID:    first.taskID,
 		mergeable: true,
@@ -770,7 +782,7 @@ func mergeAllRuns(items []triggeredRun) triggeredRun {
 		groups[it.taskID] = append(groups[it.taskID], it)
 	}
 	var b strings.Builder
-	fmt.Fprintf(&b, "【本会话合并了队列中的 %d 条触发事件（共 %d 个任务），请一并处理】\n", len(items), len(order))
+	fmt.Fprintf(&b, "[This conversation merged %d queued trigger events (%d tasks total); please handle them together]\n", len(items), len(order))
 	seq := 0
 	for _, tid := range order {
 		g := groups[tid]
@@ -779,12 +791,12 @@ func mergeAllRuns(items []triggeredRun) triggeredRun {
 		}
 		for _, it := range g {
 			seq++
-			fmt.Fprintf(&b, "\n── 触发 %d（task#%d）──\n%s\n", seq, tid, it.message)
+			fmt.Fprintf(&b, "\n── Trigger %d (task#%d) ──\n%s\n", seq, tid, it.message)
 		}
 	}
 	return triggeredRun{
 		agentKey:  first.agentKey,
-		title:     fmt.Sprintf("合并触发 · 全部 · %d 条", len(items)),
+		title:     fmt.Sprintf("Merged triggers · all · %d", len(items)),
 		message:   b.String(),
 		taskID:    first.taskID,
 		mergeable: true,

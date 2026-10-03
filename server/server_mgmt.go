@@ -1358,7 +1358,7 @@ func (s *Server) fsUploadSkill(w http.ResponseWriter, r *http.Request) {
 	skillPath := filepath.Join(s.skillDir, name)
 	overwrite := r.URL.Query().Get("overwrite") == "true"
 	if _, err := os.Stat(skillPath); err == nil && !overwrite {
-		writeErr(w, 409, "skill 已存在："+name+"（如需覆盖请确认后重试）")
+		writeErr(w, 409, "skill already exists: "+name+" (confirm to overwrite and retry)")
 		return
 	}
 

@@ -212,12 +212,15 @@ func parseLog(line string) LogLine {
 
 func levelOf(msg string) string {
 	low := strings.ToLower(msg)
-	for _, k := range []string{"fatal", "panic", "error", "err:", "失败", "丢弃", "拒绝", "✕", "不可达"} {
+	// Substring-matched against the lowercased log message. The vocabulary mirrors
+	// the English words the log lines now use (failed/dropped/rejected/refused/
+	// unreachable -> error; retry/retrying/disabled -> warn); the ✕/⚠ glyphs stay.
+	for _, k := range []string{"fatal", "panic", "error", "err:", "failed", "dropped", "rejected", "refused", "unreachable", "✕"} {
 		if strings.Contains(low, k) {
 			return "error"
 		}
 	}
-	for _, k := range []string{"warn", "disabled", "禁用", "skip", "stopped", "⚠", "重试"} {
+	for _, k := range []string{"warn", "disabled", "skip", "stopped", "retry", "retrying", "⚠"} {
 		if strings.Contains(low, k) {
 			return "warn"
 		}

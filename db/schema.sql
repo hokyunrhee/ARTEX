@@ -1074,6 +1074,11 @@ ALTER TABLE intercept_pending ADD COLUMN IF NOT EXISTS audit JSONB;
 ALTER TABLE intercept_pending ADD COLUMN IF NOT EXISTS decision_source TEXT NOT NULL DEFAULT '';
 UPDATE intercept_pending SET decision_source=CASE WHEN rule_id IS NOT NULL THEN 'rule'
  WHEN reason LIKE '[模型]%' THEN 'model' ELSE 'unknown' END WHERE decision_source='';
+-- English conversion: rewrite the legacy Chinese model-decision sentinel [模型] to the
+-- ASCII [model] in place. Runs after the decision_source backfill above (which still keys
+-- off the Chinese prefix for untouched legacy rows) and is idempotent — once rewritten, no
+-- row matches. Exported archives and stored audit JSON keep [模型]; readers accept both.
+UPDATE intercept_pending SET reason='[model]'||substr(reason,length('[模型]')+1) WHERE reason LIKE '[模型]%';
 
 -- =====================================================================
 -- L. 漏洞发现持久化

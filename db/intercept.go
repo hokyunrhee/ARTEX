@@ -226,9 +226,11 @@ func scanInterceptApprovalRow(rows interface{ Scan(...any) error }, r *Intercept
 }
 
 // Keep legacy rows without decision_source consistent with their displayed source.
+// The LIKE set matches both the English decision-source sentinel ([model]) and the
+// legacy Chinese one ([模型]) that older rows still carry — see intercept.ModelDecisionPrefix.
 const approvalDecisionSource = `COALESCE(NULLIF(ip.decision_source,''), CASE
  WHEN ip.rule_id IS NOT NULL THEN 'rule'
- WHEN ip.reason LIKE '[模型]%' THEN 'model' ELSE 'unknown' END)`
+ WHEN ip.reason LIKE '[model]%' OR ip.reason LIKE '[模型]%' THEN 'model' ELSE 'unknown' END)`
 
 const approvalRowColumns = `ip.id, ip.rule_id, ip.conversation_id, ip.task_id, ip.agent_name,
        ip.tool_name, ip.tool_input, ip.status, ip.reason, ip.decided_at, ip.created_at, ` + approvalDecisionSource + `,
@@ -244,11 +246,19 @@ LEFT JOIN intercept_rules ir ON ir.id = ip.rule_id`
 const approvalRowSelect = `SELECT ` + approvalRowColumns + approvalRowJoins
 const approvalRowSelectWithAudit = `SELECT ` + approvalRowColumns + `, ip.audit` + approvalRowJoins
 
+// modelDecisionPrefix / legacyModelDecisionPrefix mirror intercept.ModelDecisionPrefix
+// (the db package cannot import intercept — intercept imports db). Both are accepted on
+// read so rows written before the English conversion still classify as model decisions.
+const (
+	modelDecisionPrefix       = "[model]"
+	legacyModelDecisionPrefix = "[模型]"
+)
+
 func interceptSource(ruleID int64, reason string) string {
 	if ruleID != 0 {
 		return "rule"
 	}
-	if strings.HasPrefix(reason, "[模型]") {
+	if strings.HasPrefix(reason, modelDecisionPrefix) || strings.HasPrefix(reason, legacyModelDecisionPrefix) {
 		return "model"
 	}
 	return "unknown"

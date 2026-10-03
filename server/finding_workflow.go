@@ -15,6 +15,11 @@ import (
 )
 
 func (s *Server) seedFindingWorkflowTools() {
+	// English conversion: reset every built-in tool's description/schema from a frozen
+	// Chinese default to the English one (digest compare; operator edits preserved).
+	// Runs here so the TestFindingTraffic* suites, which call this function directly,
+	// observe the English traffic_search description.
+	s.migrateBuiltinToolTextEnglish()
 	const hostSearchDescriptionFlag = "finding_workflow_tools_v3_host_search_description"
 	if value, _, _ := s.m.pg.GetSetting(hostSearchDescriptionFlag); value != "true" {
 		// Only replace the original built-in text. A user-edited description is

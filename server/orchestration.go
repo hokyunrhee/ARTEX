@@ -503,6 +503,11 @@ func (s *Server) seedOrchestrationTools() {
 	s.upgradeReporterTriggerMessage() // 老库补迁移:让 reporter 回传 evidence_version(一次性)
 	s.seedFindingTrafficTools()       // 增加可选证据参数及只读证据工具，保留用户配置
 	s.seedFindingWorkflowTools()
+	// English language conversion: upgrade seeded Chinese defaults to English for
+	// existing databases (digest/literal compare — never clobbers operator edits).
+	s.reseedPromptsEnglishV1()
+	s.migrateReporterRetesterAgentMetaEnglish()
+	s.upgradeReporterTriggerMessageEnglish()
 	// 注：pentest 的默认工具绑定无需迁移——BuiltinToolSeeds 在全新初始化时就把
 	// list_assets/insert_assets/report_finding/list_findings/list_companies 连同
 	// pentest 一起 seed 好了（项目尚无旧库，不做迁移）。
@@ -689,16 +694,25 @@ func (s *Server) reseedWorkerPrompt() {
 // 写成「启用自动绑定才读」,默认关闭配置下 reporter 就不会传 evidence_version,
 // SetFindingReportVersionByNodeID 便按 legacy 语义写 -1,漏洞详情与 Markdown 导出
 // 从此常驻「证据已变更，报告待更新」,而 UI 上没有任何入口能把它清掉。
-const reporterToolCallMessage = "上面刚有一个漏洞被 report_finding 登记。请读取返回 JSON 的 finding_id（独立漏洞记录 ID）与 finding_node_id（探索节点 ID），" +
+const reporterToolCallMessage = "A finding was just recorded by report_finding. Read the finding_id (the standalone finding-record ID) and finding_node_id (the exploration-node ID) from the returned JSON, " +
+	"then call get_finding_traffic(finding_id) first to read the current evidence list and its version (an empty list is normal — write the report as usual); " +
+	"if the run guidance has auto-binding enabled, verify and bind this finding's traffic before reading. Use finding_node_id for node detail. " +
+	"Finally call update_finding_report(finding_id=finding_node_id, report, evidence_version=<the version you actually read>) to save; " +
+	"evidence_version must be passed, or the report is permanently marked out-of-date. Do not mix up the two IDs."
+
+// reporterToolCallMessageV1 is the oldest (0.3.8 and earlier) trigger message; only a
+// record still byte-for-byte equal to it is overwritten by the migration, user edits are
+// left as is. reporterToolCallMessageV2 is the pre-English-conversion Chinese message.
+// Both are frozen fingerprints — keep them Chinese (allowlisted for the no-CJK gate).
+const reporterToolCallMessageV1 = "上面刚有一个漏洞被 report_finding 登记。请从触发上下文里取出 finding_id" +
+	"（工具返回 \"finding recorded: <id>\" 里的数字）与任务 id，按你的职责撰写该漏洞的详细报告，" +
+	"最后调用 update_finding_report(finding_id, report) 保存。"
+
+const reporterToolCallMessageV2 = "上面刚有一个漏洞被 report_finding 登记。请读取返回 JSON 的 finding_id（独立漏洞记录 ID）与 finding_node_id（探索节点 ID），" +
 	"先用 get_finding_traffic(finding_id) 读取当前证据清单及其 version（空清单是正常情况，照常写报告）；" +
 	"若运行指引启用自动绑定，在读取前先核实并关联本次漏洞的流量。节点详情使用 finding_node_id。" +
 	"最后调用 update_finding_report(finding_id=finding_node_id, report, evidence_version=实际读取版本) 保存，" +
 	"evidence_version 必须传，否则报告会被永久标记为待更新。不要混用两种编号。"
-
-// 旧版触发消息(0.3.8 及更早)。只有仍与它逐字相同的记录才会被迁移覆盖，用户改过的保持原样。
-const reporterToolCallMessageV1 = "上面刚有一个漏洞被 report_finding 登记。请从触发上下文里取出 finding_id" +
-	"（工具返回 \"finding recorded: <id>\" 里的数字）与任务 id，按你的职责撰写该漏洞的详细报告，" +
-	"最后调用 update_finding_report(finding_id, report) 保存。"
 
 // upgradeReporterTriggerMessage 把老库里仍是默认文案的 reporter 触发消息刷成新版本。
 // seedReporterAgent 受 reporter_agent_seed_v1 守卫且只在新建 agent 时写触发器，所以
@@ -742,8 +756,7 @@ func (s *Server) seedReporterAgent() {
 	if exist, _ := s.m.pg.GetAgentByKey("reporter"); exist != nil {
 		return // key 已被占用(用户手建过)——不覆盖
 	}
-	a, err := s.m.pg.CreateAgent("reporter", "报告撰写",
-		"漏洞详细报告撰写：发现漏洞时自动触发，查取证据与执行过程后写 Markdown 报告并回写。")
+	a, err := s.m.pg.CreateAgent("reporter", englishReporterAgentName, englishReporterAgentDesc)
 	if err != nil {
 		log.Printf("[reporter] 创建 agent 失败: %v", err)
 		return
