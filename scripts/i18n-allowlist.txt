@@ -1,0 +1,448 @@
+# Exact, occurrence-counted source lines; see docs/english-migration-verification.md.
+# path<TAB>line-sha256<TAB>request-section<TAB>reason
+agent/blackboard_inheritance_test.go	b9b2e7bf99bba4fb0157d609482c1e72d364ad695211b95f66939dc1883a88a9	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+agent/provider.go	d4fc0af71c6bc1dfa65e85c059291968728b48875b8e320e6efea272858ba8a8	5	Real Chinese-provider quota error detection and its positive regression fixtures.
+agent/provider_quota_test.go	76e8571bfbe5ef361393cdfd36c6759895bf345eded6abab79432f696c35abf6	5	Real Chinese-provider quota error detection and its positive regression fixtures.
+agent/terminalreason_test.go	e815f4fb6185db26d1884dca6ccbc8f0347de4d2d83a0d70b08702677e97e737	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+agent/terminalreason_test.go	a8d1e1f9440465fe7cb597a5666ec50f40d04da1e3e82138b1a2717c63ee590f	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+agent/tools_overview_test.go	2fe8952e6c397bfb2ab8569218dc3147e5a693d4c8268ea6cfc8905eb77855cb	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+db/company_scope.go	96ee89221d306275e79cd2db06fd5c4384e593588c9a9b96b6d86a416b545041	5	Real-world ICP filing marker and full-width domain-dot detection.
+db/company_scope.go	aa7d15507b1bcd79e0abb73c03f8e3f5eac5ded4fdbdac0c0396fee31808e315	5	Real-world ICP filing marker and full-width domain-dot detection.
+db/company_scope_consistency_test.go	10bf00af401e02bedbb94eba2ec025949e12b4ea59e4e709d48d6eda314e8df0	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+db/company_scope_consistency_test.go	4180af7cf07d0047d1d2c86a26fa864572b59a525ff56ca3b4cba3544b694c64	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+db/company_scope_test.go	947383a9268c23186c22aea4605a6d9c46b3bf58b713a8c1c7106d121d1825e1	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	e0e47dc7282b533d40fccdda049f7666df860f0c3b8d29f4e49d3fe9a8c216e5	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	c46eace4cdede26896f5e8ba1e352054b0d494d83a583965f85e4fd0589449b3	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	0b47a2036c7b750fdfca5353c7419d28fded7fe00d6854eac17478973ce1c473	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	cd542ae40ccd0c0f908cb2d2a0284003e942f419c92c74b0ce7eaba4b8898fff	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	bc82eddb9e99a2342386d7aedb725f873cbb6da440885c032e536ca052bbe786	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	e103be5148b29098723e9bcead0249668780b7181bda2d1852d7c58ef94be933	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	acd624d870bdd762f89152233ffaf6f8af18c66b8ece580877b07ce9e619a612	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	4516f359b63eee0ffddc67b054bd77c3546011f95e6d364dae168d32dfc8137a	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/company_scope_test.go	96e673ee64ddaf82bcf09949ab994b5fe9dc328fd6e440a90755eb288c8f4498	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/english_rules.go	2727136f8ac57985316af20b2d5f45ea7f914799afeb423c415e3f2277474775	4B.7	Exact historical system-generated display text used only for conservative cleanup.
+db/english_rules.go	881edca55930749ba9eccf9d0257e089e6a3f8fbed6ff7abfc3999704359d348	4B.7	Exact historical system-generated display text used only for conservative cleanup.
+db/english_rules.go	51a5aadcc255e515e8260845164ba5004c93be8febee7a8735c4e2158220d445	4B.7	Exact historical system-generated display text used only for conservative cleanup.
+db/english_test.go	81fdb725953c83ccfbbdd9f8b4e6a163f6787586dec3ec86da7ed416aae18bd1	4B.1	Visible legacy-language readiness fixtures ensure untranslated targets never consume migration flags.
+db/english_test.go	8fc3be490d87b25f931cf59f43116499b4916bbe9fe55cd8d0fd2169f62a22bd	4B.1	Visible legacy-language readiness fixtures ensure untranslated targets never consume migration flags.
+db/english_test.go	3d62a5656f7734916395dbf52e8016bb8e6c7b4caf8b005ba6de9830e99c1dd2	4B.1	Visible legacy-language readiness fixtures ensure untranslated targets never consume migration flags.
+db/intercept.go	0bc85792fc6d69cc955642e4d403c1503a0665ad16161afd2b72699c3d3770c5	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+db/intercept.go	11ce32d3a9bc09294748faab8ca85af331bbf67a532a0a6446fdeb901c77e069	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+db/intercept_english_test.go	a49a9898043296972fbd7a450d23c5a4ad9009dc4a26ad6b1aad64336cb83b6e	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+db/intercept_english_test.go	981106c996a7087a9f009160891c70246f9b2119dc6bbd931ede1d5267e2cb4b	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+db/legacy_english_agents.json	ed52d85554fdf186ae6c4dc966ffa807ee989676cf5314183df4b46f98993896	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+db/legacy_english_agents.json	c58fc384ffbedd31c1bf18fe2c869e747b3cdda3b4364ccbae21f656cf7459c3	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+db/legacy_english_agents.json	33455b1bc92bcf044845e9138383223a31b7e0555e388940d937fc922ce47a6f	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+db/legacy_english_agents.json	9bda9c1c2df03429a8b206339ccbaf174ad39ada704a364143f982b34a0592de	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+db/legacy_english_asset_intercept_rules.json	80ad8c76f618e520bb9012a96c6b84d220c7ce955729968b286babe4cec03a72	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_asset_intercept_rules.json	b653714fcc2d7699ef9eec131b98771a40f16f0e4f550d856a5a55eaa610fcfa	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_asset_intercept_rules.json	89000f0460a8343810143849ad7e8287c60482086c59ef428a97b7b92a0434db	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_asset_intercept_rules.json	80df5d579189379745edd45d71bd86dcfeaa2cb4c02dd972ebd9327c785c335a	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	bd7a575c20a470add0a3bc897b20471aeece01933ae1a4a204de6b25385468c3	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	2e2aad93987fe06e156c55799081baf5654578026ab2b9415b1a7f0463511495	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	1f66880926cecb2cf0c23fb72a63575d87836f2e42edf6541a8181a4859dbe0f	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	add093f19ebbea64fde16c8874b5d1fb223422d5f0346b8bf43f093ec8644f3a	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	21d56f1a18eb04efb2631e7d61431e20804e4a42d269f9222f9d94f3ecb5c725	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	6c8619eeb21517d0b97ecc6a73579e4e840a79309cb85a6f4b177e50f4737716	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	60c4facc3ae4c5851943884acf85d6a6ecbb85578d1f59ffdb57524c77ac010b	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	f363aeb57fd7dfc071e2942649c97bbd82158ee1c021798b3ba0cd30b6b62eb6	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	cf9a8264241d89119d931953831e58140f20d9207d911dcd34a7536372ffc8a8	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	0699f0e61d1ed0a551a29fecaee34b1cb6714bed3691f86ca9022f27069e9e4c	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	8228ea6576a8a1722602ece2556bf386904b4b2988e3eb9af0b908373976ca84	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	498ff8a1ab1c7cebb1533062e96f10e2b4cea6558cad0fb05b3f1996cc6dc77e	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	0c60dbc498e7f60759cb68be7d44e12d3fcf7762e01becf31126ff037c291028	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	fe652e8ca63c4496e50175c5fe74eff4a26eff926cef19e61ec480f5410f5750	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	575a470b267225b7c0d31b8ce3fab15ea09c7c8cb56ed23602113edd15bc08ad	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	5ea9f6eab95aff8956f0e07cc1c917fae8ac8ca341114ebeb9bcc78aec72e623	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	a0450ecbb3d55976549aa61a26719d0292eb756e35409ebaa1686c69f57ac532	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	a5cc354987919ef6d9b75b3e52e8a758e60268e0aac5e112354f1cbd919f979c	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	2dc3c22f13a20ed4eed779e975616a3d8e9c45b4bae2b1b80fc1a09985d11601	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	9caa5a1034df0a262870923cd8691b740a395fb9510c3f3751a165d26529ac88	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	6eeb896b73855c732dbbca519cb45a66c06126d723061f954113377762a50bd2	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	c4ff0487867ca6bc2f1974e9f152d6ef5b7667478395f947c7d739023dbbaa64	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	2b183fe0318dcbc2a25f472fc2a9427e0f72feb1f4e9bd02ac3572a1aaf49b2a	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	7097df5598215d4fde6cd19ed226eb6d8b8218e56575028c7ddee971e70f6761	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	0dc39fb191bd1c0eb45e7c08fd51d22db904f9b18302005cba38e973662d2fb3	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	7321e7ebc0cfe13e1b96eb7902263b7c672f42329c2e27924b4c416fb0c99332	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	8f3aa4b8b5552af229930e55c6c95d20a8d34d366f50a24aa6cced1f664c1b27	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	7e89248dd255c37b4d54e1c9b6b4062ab633857c1929b63d34e7e1dfa657b7c9	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	be9228bbc27e0e0eb965ed2999bd99f288ce580ca269c1ea567eae235297ba37	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	dfdb14ee8e909ba598a723b90b7f6650dc930152aadc96709002a1a158554586	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	db25aef240142b377cf134cfc1b64d8dc2b1b311bb443ba6d3012159e3e007a4	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	eb95d1005aa4461b75c359923176e1fb1266ab43c381335500811e1944b720ab	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	e1e2dfaca291832904319b9c146c6386ddc7a8e821a022fb83ea9d5571a6e493	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	29df9cdd542349f8e106e690a8405c44d3ad76636abbab6e20f2b95634b7e816	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	faceb13564277f1ef174c55540925d6f9bc16e74daf08f4a94464580d17b6597	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	592ca6a9a33103bfa99caeced36bea34112d8d317beac11c8ce690fbf7789226	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	cd77fd1b151e0e61e72e38d108ca0da6a4b14dafbb91b4d9a25833eee5b8f547	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	9dfd120858d5dc4f4e3ba377a12829af58fb9c70421b4fcd44f84bba9f71f540	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	78a762792c30a29855ffb7b1e7b72b21168bfe27ca0a3c0ccfc8a01d8439327a	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_intercept_rules.json	24420fda31242179e27a93f683ddd9b69e99392091d90edf9f2279458d201733	4B.5	Frozen seeded rule identities and notes preserve operator customizations during migration.
+db/legacy_english_tools.json	f95a12e10d3ca5b707b2757dfe89d531b7fb0b80e1aa3c483f75f3bff2896cd6	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a8de23b37b9eb4303dd8f7bd1237b11930feed19b03ba7e04206808c1846af81	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	07e3d86175ef0c0bdaa20eb8c554c1d1bf434480f70f38352d6f62e105ee62e4	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	9a03367343920933d13228113fddd8028ac9d04acfbdf9d6c200899c9679e106	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	9f5c8538a7592e8d0fed46cc94f619eca84f2faad1a43674966f2f019750b73c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	57eb4b16f1d7a9075297bf8fb4dcc87a05e2ad0ee32e6f37f93d83593109d2f6	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8910cd3edd1a738df06fb3d3ce1fda2c3816c35cddfbc9bba26781358ec4239a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3fb0b5568b2d53eb20bb46d722b75bb27586f1f5cf0f647fb960bb45d8d57642	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	69568e0217d4c74e40b1458a59bcbae4c299ad196f71294f1cec75c0df9246c0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	291bf1ac828398f0bdaa74a1e9c8e3b509eda75a145cd9d198cd588a5a1fe1ca	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d861aebff4d8d0b3e8fc7de2a7e1d701f68321f3dd63e5e45876e614372ce8ed	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	754dd79a752157ea1a4af4e753b23498fcbb6f3d5939abdcd00e6a4a84323f82	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3fb0b5568b2d53eb20bb46d722b75bb27586f1f5cf0f647fb960bb45d8d57642	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8422eda8b53908f3f3a261a15435887e6a4c55a8ffbb76fb5f763efffb9aa897	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a617c6592a4279990c95bd6f533301f5b50aa0f2f74186fb60b4a082ce471a22	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	32c2e9f0ebaf17768e3500cfd24a865cdfaafaca4daac9d4575bdccd9115dee3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	aae834ec41fceeeddd791b6abe0cff4c39bda77b6d19b27671fbaa77c9f322d3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	87cbd0d1a7d5c615dcc06bd6b669ee7eb75ecb2b033f24ed9fc4a3471a7baa5d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7ca8535dd94e4fe10da4f24cb29c274c7d26b6a8ec36fe1f7bcbaa0d79082a9f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	14dd49744395981fcce5d992c25c5d35bc2db1ac7a77b5c0b1fbe93aed920fe3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	86f8d98644496a2d1415e98bc09cbb8de8930546a43a3ffbe6776471286fa1e8	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f48ed04813e0c59f2a2a33a912117538f45f34228b51275a306103581f0fca6b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	1758a19a39f62828ed379479671408bb3c6bbf8a8e32d54dbb69def6cfff5072	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	465ffb09c50ae6e300931c6bc0a9e425fe08993174661a458eea0973ab813c4a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e2f1edd48926a63fcd4ef04e0c65c303909b2825805fb3ac6a211770eefcb535	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a97641fc49fc85c0c4d7006e6fc441bd1ca6a6dcfcbd9884cf7de6ebb219df3b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	c14ad273a1cbcb18d1f0fef4aba03b242e8fd5911375b08168d7153a7c15902d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	224739983d3bf9e8acd7d70e4aa88a29dfdbd3d6456e536d8e36f318a821a10c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	42dba352eb078220b16c06bf4d26555d2202c8062364c02a56fa47a5e0ad4461	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ad11083e03c09271643a5e23a170edb6a6640a9bbe194cbfc57501b35b99905d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f1ffdd99ea2fc9abb2ba3667c9274dfbbb848c4e983a9dac15e36c71cf06cc8b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e46cf3b12b07806f211d94dad0afb6a6e7765c46bd31cd3c0606b3e77c691a02	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e69f30b0e931bd44ad5c8773f41602ff7229db0190fe5a1af90ab14e6a5cb17f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	861f051842ed0e88e32ce5755127902d33e6000d935164bfa508e9f1ac958d1c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5663682c02150ca6a26030c0fbb663fd9831aa3c5acff82a997391ad8df8a4f0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4fb8aedfb13a21dcf2f958ea21b7d78558ed94cef9d211264b9401aedb2b322f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3927a664c7c0d5b3154a8140771069f7f9aac51d48ba1e64b1020b769399e57e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	1ce9b7fc6557a54cfb315103b92ee4d6169eaf14366dff13941ea7bdaca47787	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f60ecf8217fc4f43ea4da652a7043eb46aba77c7ce0ac140c164761ff171d6c2	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	272c9b018492287aeccb16cdd04eed6cb61cb973a79d1d814d3b8e852a55d4c1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	861ea1f51347455845355da75bda611753d1675ca055dac8ddb77b39c74bb679	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	17fe3c593a34c25f0cc42d2d057eb47cb9aefbb69ddc39af5c836f3500d532b1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4f76d7f47dc2cb2b2b711d698343d4da32a1e8f8e47918693991770101563809	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	06af5bb5bb126aa27402a196c867ab903985bd8b81d7a3227a5b85143af08234	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	52b3a5920ece887c82f1376b99ef4f53f8ad3029e7c2f74ea0201f253990a6b0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8157f07e45ac287fc4d01224bb752dfd1af7111a9e356cacd9d014330518709d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	664e852c7958fc212c5bdcea233623de35ce78111407994b2e6b4d4df4fc926f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	90ebb7251b913bc1ee1b971c87b1f9f69d65095fa3578b8cddb0c07eb7fe98fb	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e353674b3853d3bdbf88f7c7c44704880b2a990a086c31a1fb1d67db3afb508f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	340dd77b64aea9a5653838005d46291f937ce004612d5666d0ef63315f4014f1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6bf5d671c62656bfd219b2479aa6c6ca34fcf20a8b7cee25cf1277b94c7dbfd3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d6316daeddd84b9b931458a832c87d1136fdb2a891b39fd8389e74218430131e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a527ed3e10a91c715e75662b557b5ab0539da6004dd95ae7fc4037fa951c494e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a24ca5c166e170429803db32ca86b6e77e2a1f2ef61f49de933f40b7e1fde610	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	dfab36d1a49ae6fac286c9eb496e36f62955e6f85e545bf9de6c3cbf2f9a3022	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	de18abe89eb733e7fa643e4fc5890c8706552a5ec150e3ed027e17f05aab4500	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8dc27b565702fddde34d3247b96384c70814479dd86aa4bad226cf0abb914b1a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2f72a9dd03ef8de51ce84d24fb9499c37daa960ca35c9de2485448bc7fa3f9bb	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	df097d23c58293b22dfdfb45de9293c618e004d701aea2d8b08171af9bea577d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ff05b78e2ccbc9673f176fa5c8ece231125bbbd22628195c3a606534dae2128e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	0fac5682edd7e3897299e138309cb0fa36f6f9af18d7229d46d9bf67a58cbedd	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	1f29080fcc43f3b6981a58472cdb10ddecda00dcffc29458f39feff8726bab34	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3a353501d66b88ce02e0b4b74dc9880c3ff7728c23b452ca540031171c485b29	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	29485ba346e9df5c010628ff0e5be47fe31bffbda01dfbd90df3b1147c06b519	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6b88abaf405dc03e949220cbaebd541152d6c0afe50f2e83e9c19b5476afb823	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	788f6aecac12ba4d09e20f740abc45a3c9cf7b3841a67cb73ffe24b7384867c9	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	0cecdf90a0697dfb28af3f9a775f2a05a60ddb2e8ff7be71ba9d81273888a3e8	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4bfbc64b67922493267b5025ed4c2ac92cfb0b1e873661c9b713cc3883768806	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6c8d368953e2dc6d625251fca84d2674f2195e5cdd517ea1a4c77aa5996cbba9	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	bd8a3ce14ac775ee706b73ae5fe258093a6faa17047398c8fdae4c9e9b930afa	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ec669ee0db9e4f9f925dc6be6e166682eae73f1d9b9a9cb5ce8338fb543128aa	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8bdde0e779d079b476f84b08db455e2ff51ef0d75769a2ec0b0db137e8cc32ad	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	401c146cf8b447e8dc035b6cbb3717a8c9317ae17121ae07957315775c6c0229	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d84921e411283669f16e753342aabee1c2f5086be39fb86887e2c5b421122626	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d95da022cf4ee844085ff1b3eec7433403cad33d1dfeae4f59b26c01ef686c7b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8987a0375049bc005a4918e246733a4910ebf59f5c6a83f979c171effd43968c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ff4a51c56d516136354d0d004f9687236954fe691c2ab7bd04216fe27979b2c4	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	fa31307412cf96b0a5dbdd719675be2cf771af31ca5de4dc12383d37a2648883	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f95b99272dc236be68bd73947e6f75b7d48ed54162cd8b991aea7fa56dee7573	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b15a5500fbe26fdd9bf7b313dea330308298fabe6d745e753502a8afcf3679d9	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	33485cfdd4f71ef175f8ee591d92e6cc655b8a358f6d0c8c24193aee74729333	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	546b9f8a2c18bad76b08df14bdec1faeefd7e5a7c24e8270aea5d4a62a3b1067	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f5a12e01aaa5a30e639c1b62fde1f5e6e683b1fdbb55ba4855e96dfa626d0ed9	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2c1444a412190a8fbedd8a85109459bfaae5b21b2516e1965a097d7a7850cbb3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	bb51b35b8ba560538dfde29789cfe79432990d23ea1143d3c421b8d92bf5fa12	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e66d270037198947d0c62ff152243a6572666bcd7333662c1a7e71382d13aaaa	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	08539200050fa0cf226ed5b31a07841d177a2cbb4ecedb26ae6302ab6f0b8957	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	eba1c7d5221fcf9e5ef4d350b17ff6bcad7a149c576177daaf726c3d6473dff7	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	67f2f4e56cc49684e3bd1e2ede71e54a7ece7d52bbf3990432529a4a85e41f8b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	0fae09e5568610c6c54f3c2dd5e3a6a7130d7f4e2f338333910788ff571ae208	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	663af99f51797cead3d5bd6c8d21f7fce47678b5f1a8e0d4e877f5d427d74862	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5b2453674ffd3fce583ddb93c5e6fb77fca2e94f57598d1522ed1101067ddd11	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	9b6d5155958d41aaf4cc98de85656adf54fdf091542a03295a80673a10dc9684	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	61dc31a4487859abe4a17acf362d852b505b2d6c01709e2c935b0cdfca350a3c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	49400eefa56cc21cde58b62eb4c5de48ef52957d0644b833783598f175dc5afd	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2515c5f742c52b1601d01c5aeddf831edc6c231beedcd38f3e22ab6fb08e11ee	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	766f83aca44919da064d9303c7f97fd1f3e40675baad1ce65edcb7d50b62a258	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	cf09a67161cceec505737710e49ef36681bb4f35cfff915b8eac0b14d7ecba6d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5bc00caff2cb41d8e62c7c37ccd76166ace97d7424dff764949a4d55c405a265	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ea6f2563cb32b685b2ec9c9bfd574317c4f2dfee8cb60f1fc1816ca6e4b192db	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	16bcdedeb264d35e10691755576b5855349db35e0bed8d876762bc6d3e61053b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	127ec4e25caaec84bcec8b9e73e0eb2afa2b4e22830f46c6cb88a1e01329a405	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	df59b79cba17a09e37bae824d8acda26227496d56ced8603748a01a22b228efa	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	beb6d1745b58650d5210fa939695bd063fb47fab3c14d920f3366cae90361a69	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8d62e572efc6b26f4fbc9d8c45724664ee922d0c63fb220cbc827fee63fe7663	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f0cdadbdccb8f8becd4ed54ee91164553d8f776ce19f2f0743133452100bb30d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7893928533583d9dc370aa7ed4c3a7f469185dc37a65fedcb6f47b394d0ae025	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	671f436b4937712686b7ace49bbea86ae0d9f78300ddf3b99a40edd3c01834cf	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5c63886aaa97dc7665d72de4a17991f751546c08fda7afc421262589b3f77d61	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	c917858f4fddda2d20ff46bd9c439fde3a9b613d6b57f95dec93e912c6fbb50b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	902a679b8d466e2bdaaf33b38b2c0e84c2dae2f11bacfcada50088adad6d1742	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7b89815671a5bbe240aadb5e36fa10fd03f0ecd7ec108050fdee2c57f69f98ce	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	00c1df564bcea699eb4d3ec40f4fca58345f2668a708f55fbcb4eb2bc81cc897	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	215a3076957f98651b044ae4114abf613efa18e2a9419eae0223ac4ef772f998	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f7b4462b591fae6012d49a766caf4b9102d754cd7ab85d8ada5653008375f009	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d9ce56b5890ae79c203061a2deffcd71d3b92f293886e10ee3ea60f840088727	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d1f472b6981041eabf5b80091ca61983979f41f77e6dcb81033d47d4ac6c6b9d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6563e902413efa2e5f6fd2bff9ef76c3dbf2d757237cce60ac561af3b73a66b0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	c6924a42f4888dfb603affcb62e12f2b1e41cb7b665631d953e11674805c46e7	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	bd69fe820eb2fcdcca4fc2c5d0bb36676ee291f82256ee772d95ee3d0bf2ec17	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d9cb31d3ef205d847169e39ef9b5cb1d3a8d2c641483fcf4aa6814495e96bebe	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6a7970d271020764abdfa775021b44a75c8d8336cb17fc1b0e93c316df75a940	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	40afea8482d74f6ecbdd221e9e118c851bc1094832bbb6d0d1cffacedd92e1cf	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7fe1304f62129b043a5c904061db4826ccf44b99e72345036c19b010d017e5ff	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6b1c8825ba162d9e1f23fbae6fb0062ba54e1b852028c626ac0388d9cd5c7234	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	fe81eba26a4fadf8499a74d4596e3487661c702e929a97191bb1aa00907342fd	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	642bf961690c81486920dc1d46d08ca0abcc7b779084f73070cc5cf4f68735dc	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e2f1edd48926a63fcd4ef04e0c65c303909b2825805fb3ac6a211770eefcb535	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a97641fc49fc85c0c4d7006e6fc441bd1ca6a6dcfcbd9884cf7de6ebb219df3b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	c14ad273a1cbcb18d1f0fef4aba03b242e8fd5911375b08168d7153a7c15902d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	224739983d3bf9e8acd7d70e4aa88a29dfdbd3d6456e536d8e36f318a821a10c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5fbd28016a5ee110f76a5d4c5d6ff45fe5be7ce8187947d99a74ff627a9f967f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	841fd510b37638569f8a01d459137dcb46876abf01cfb31c0e14de79c9d387b8	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f1ffdd99ea2fc9abb2ba3667c9274dfbbb848c4e983a9dac15e36c71cf06cc8b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e46cf3b12b07806f211d94dad0afb6a6e7765c46bd31cd3c0606b3e77c691a02	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e69f30b0e931bd44ad5c8773f41602ff7229db0190fe5a1af90ab14e6a5cb17f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	fc33970ca8f76fbe50ae562723f552fd2ba07c43a1af38c9a70299f5478755bc	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d953061bae35a2076757d3c64d7b775f23812cfe7801ae2cff84edd2dd33193e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	efae2b35a26349719db4f14e4fd1bf8f450676186d68fbb348efa9f10af3d011	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	496517046fd4e52b48f88c6664ea580d08752614c57080d59647481fd1c4ef0d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b9e6c5a98bf5b49d90a96ed523ff58940284043fe227641d38fb0f61adec83ad	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	06298db444f3901c043a7768bd92287729dc77d079a5f476ab0573a20b38696a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a75720d8cbb763e87822625287acbbf29e52c31449449de73f0f06f079545521	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8a080e04d85d7451b00b033b190136ad717332f5400ce717c6357ded973dca63	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e407d2e361d7ec30609d2a2bf38b4b17bdf76eae9b3d271e51618b8f54c37b72	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	1a0a1c766f5845345e9b29fcb9aabe186f5e37089cd4edb5dfa1fd07010d47f9	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7806ae496931005eafceff863dd1b7c882a35aadd496aa0bb6f9208ee26be7a0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2275899be0a5fe15f1b404fe11b5b6078a734f1d8d8357ae848570abe5d4c9f2	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b0a9b1086514e60d6c114baa8298b42f8662f49ff2c550a9c3b27c55361cf183	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d8fffa16513eee8fcd47421e98986e517d211338a004e99991a9a11968014fe5	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ffa3d2e0785bf2616a53e8d06598e21f3033aa931f6aab9884dc025f89d864ac	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4d6dae1b9f887b1009782b46fd478e941050228f83aaa9cfe656cc41012bfeb5	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f9cb0f51fba339ee7c19beede922d9418c93084251e75acd13ebcd985cf6cd0f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	18ec6d65d6a583c58f0286b28b5613edea74b6d8b9ee226c8e7d41b24304a9cb	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	097bcc4277284fed8fbc0b9f928eb4f1ceb6a2d354624d6b658cc6f36c1d2c66	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7806ae496931005eafceff863dd1b7c882a35aadd496aa0bb6f9208ee26be7a0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2275899be0a5fe15f1b404fe11b5b6078a734f1d8d8357ae848570abe5d4c9f2	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b0a9b1086514e60d6c114baa8298b42f8662f49ff2c550a9c3b27c55361cf183	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d8fffa16513eee8fcd47421e98986e517d211338a004e99991a9a11968014fe5	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ffa3d2e0785bf2616a53e8d06598e21f3033aa931f6aab9884dc025f89d864ac	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4d6dae1b9f887b1009782b46fd478e941050228f83aaa9cfe656cc41012bfeb5	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f9cb0f51fba339ee7c19beede922d9418c93084251e75acd13ebcd985cf6cd0f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	33b8a349c7b58570aa32a3f7679b3d65c6939e33e4d81d718174dd2768c571da	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	28d756894d3ab7bd3a3a263a0018b1a74d9aea31e188bda0a4b4bee4ecdf0046	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6078e1a7dc8a431bafbedd17a53a52995b82d300c78de2658d695a5ac978af59	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7b8c527243d521e49900774a05f1b4ec1607644ac06a9d46c8d2739196330b24	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3afe4026c334880402222ed213a05b26a8be22662fb4f3ecac7bc76ec0c09fd0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b03196f224c5b6223a88956a98ae54c9f2f7b01aab447fe478f8f2bf8aa77fcf	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	64b88ede75e57bf82ad4cb2205c96d7cba6f76c2b61bba8669dfc032a8bdc220	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	0e1e500f68a8a57488f135465752e8db692dd44d42483d4ca8fb639d8d57fbde	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f67b12af84b6ff26500fe632aaefe4d4ff93500cda4553282870fa20ef844198	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ed60f47f7a8ca1f05a78610fc9b23e5d1bc01935af63cf980a421795184955e4	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	41a855889db586b922621565781ad693f3577b5dddcb5502ac78bd959d906095	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	eb3006493291b02eae0fb85eedcd33bea4540d20f76eec5cbf5e202e90651c24	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b75dadb9b67a1e47e47da379de741b41db441a16e5088a51a46e292af5236590	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	73b5a2b6f9a5503469a6d48c627c9fcd3b4e2f2823fbed84256f192485a6b811	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3f96cd6a38c415dd952cb8838f900671cfa9f9413dac4378e1176b3f5daff824	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e32f7b74f4124eada35ef971899b5204c60db573b7796c1360de95a8175faf3e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	74e32967608f34b2142e1c43578308e3c48aee38aed8388223fdafe8d2cf472b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ac28f32c8059ae5ef7e8f8a5e4f90af27aa10a1901e966ebeb3f087f2da82052	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	30d3ef3a88afe4e01a7908c1fb61eafdc434a12b03833d28ff1b453152146fb3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2f2d918a899f8b24e78b4b43fe95f555896206bb8120649175fecc4a516a0266	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d75a3875cfec35d75cadd63a3cf9472f24d42a88b63537eb779137b4a89eb232	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ffa3d2e0785bf2616a53e8d06598e21f3033aa931f6aab9884dc025f89d864ac	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	216762e834a606a6685757a5b5bd7bd93a8888b0e81c592aa729686a70506a75	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d3db833e9dc0dfd0205390afba4a989b171e36f88b893e74e6ba1a9c211b7076	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	70b4b7fff38f5df03298a879ae49b06ff51c58a2ea1e242880482b76933c634c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7acf6a0025d8d3ef794b197a344e89187f114ba94fd57d5d4d7a1204ac3a900a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	9a03367343920933d13228113fddd8028ac9d04acfbdf9d6c200899c9679e106	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e5a9832220312315ff7d97b5a7e411608bd36d3a63619c528b081ab560c5553b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	23be7fc6cf1cb02a2ef461eb1bbe461c1298bcab2e7379d58f7b18c12022c07c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7d66913127f7331f5b375734be37395e9992193460c4bda4a3a8eca5f765ed0a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a2ea0a7c5106b494f9a0a384633e45554cbcaac9b1bf3dccdf8a54ef1880d25f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	eea2e05da312b7fcfa7ac9461f4fc2ed8230020ca5c6c0ec9fc88d938eea0155	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6d620598d7fcb72f47db42284623fc7d65c68a6ec64a80ec56c32bbb2d471307	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	cf78ab0dd84a81269026e19be7764025b08beef971ab7af20420c9b953e47002	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	86683f0a735649b68c9f37fe8574ab491bfa5bfd47087fca2c3e9fe9e9129ffa	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	7a1e5406a55d6b1946f9a6f18ee975ddd9d1dfd22a06a9a379bd4bcb406b73c4	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	76310c1b6aa391cdcd1861dafcfebec5cf80eb60c904a3667d2a6821414230f7	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6314ee030d7b055ebea5225900c6fbcd9008409097748b16e53af0416ff14dc1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	74e32967608f34b2142e1c43578308e3c48aee38aed8388223fdafe8d2cf472b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ac28f32c8059ae5ef7e8f8a5e4f90af27aa10a1901e966ebeb3f087f2da82052	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	30d3ef3a88afe4e01a7908c1fb61eafdc434a12b03833d28ff1b453152146fb3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	2f2d918a899f8b24e78b4b43fe95f555896206bb8120649175fecc4a516a0266	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d75a3875cfec35d75cadd63a3cf9472f24d42a88b63537eb779137b4a89eb232	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ffa3d2e0785bf2616a53e8d06598e21f3033aa931f6aab9884dc025f89d864ac	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	216762e834a606a6685757a5b5bd7bd93a8888b0e81c592aa729686a70506a75	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3bf522592d816a15a6a5aa560723b3475aa062d72ac09176e237d9c05fb9d8a7	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	32590eab600150ad67138c2916a2e836b759295a281339301ab6654bfc2ffd77	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e372ef7d2f09dbb8baf060bc251fafebacd3c4392027902ac7f486f2bff3eacd	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	48393796d32c03e84b5620799a3548b798d498b59b9a7229a611e7a65b72cf3c	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	b2cf2ca54fe5cc3a9a7062408953f61402a4a838dc0405a0b5b9b6ea24d9d483	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	aa1c275723e967046da2ef5b5a1e25c1e1674eb49a6f446eef8462b3ade962d4	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	75bf850f4634bc6a3279c11b027016acd4fdbb5b133d056d3e3840ecc3c823a7	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d5e82ddd8f2d93c83ccac9e6a10c2d0a2af2274ad1edb5e72c789becce7abc52	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	f1ffdd99ea2fc9abb2ba3667c9274dfbbb848c4e983a9dac15e36c71cf06cc8b	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e46cf3b12b07806f211d94dad0afb6a6e7765c46bd31cd3c0606b3e77c691a02	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	e69f30b0e931bd44ad5c8773f41602ff7229db0190fe5a1af90ab14e6a5cb17f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	ca30856d7246fe737defecb0e66ed0e89f5712b22764e22cbb41b2b1c2e049f1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	c322bce25cfda36f22eabca074cf1f86041e1c59b2b377ad627426166b2236a2	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	65b34a5b6ec9cba64323301f78c89df748fb1a9d878acdfbac9034b84db614a3	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	a123a32933a29e00503cd3ffa0349c85343882317149c44af578da0f8199b73f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	6c893da9d2ac1f14d17f740b815cccc4a6ca7a71e0d0665e542a0761986823b1	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	92595f9d4cba1ceaec3deea6874f5ea7935d886d29d552c557bd1862efc76c9d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	8ce1682975e075631b7cc090758a535e2141c22cc3bd6e870b6a0f630e05908f	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	27d6c79281bb92642e7fe29019086d7f7af4be5cf672353589ee3425687b2e6a	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d313344a79bec4db788cba838a907c37aa6d5af0af28f08e2370b96ad3f3fd68	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	994ff1a6f802a96de540c2156f26ad31d3ae0ca7b85941f13038ec1c28a4140d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3d0c4ebbd503218cdc680a225febc9b0ca98f87ef323be8a94ebe97cda2d0f26	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	367bae4bfad97f01ae95e73ab6a3a3c76236e0621817d189221f47cf8c480f37	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	3e90323e3143aca1b8903213e1091a6c10ded0e3791fd4ff7a4fc81952c04856	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	02f710fa09de2418f51daa49b93e7b8e923a6705fc94eef267c65bedf39958e0	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	4ff2fa3b194f446571dc2c7eee43b5048bf5f2399b0cc1fac584c14ab947906e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	5c5f676a7017c07238ba72bef987502c527c86a59b030c94c55d14c20def4b3e	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	aa22fc4b57bb6b9d214acc0edf48ef7a504adfd48999a4a5cbe1cf4d1fe6809d	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	d4fcc3dbe7e2375aa656d8ff24eea3772e226e37903e506ca313a2ece1d56ade	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/legacy_english_tools.json	fa734a4703433958a4676c052af03e7dc6eba4b96f6eb36fc29dd76187077cb5	4B.3	Frozen shipped tool descriptions and schema comparison values; never emitted as new defaults.
+db/schema.sql	3e52dfdeb0fea89afb8d7f4052bbc78975719a5cc018916ef1d5cc962213afce	4B.7	Shipped legacy model backfill and exact historical system-text cleanup comparisons.
+db/schema.sql	89a434fde1551ed700d49dbcd65b1be65576e0e2b121424b274bca971ed54f68	4B.7	Shipped legacy model backfill and exact historical system-text cleanup comparisons.
+db/schema.sql	df8a906c797f45cd660bae69a7b6c2eca2d52cbdfcd7fe1cdf2d92e307de9a12	4B.7	Shipped legacy model backfill and exact historical system-text cleanup comparisons.
+db/schema.sql	2db64f7b619e65a3c29928d8d012bfae2d3431529db18c6129242673993cd305	4B.7	Shipped legacy model backfill and exact historical system-text cleanup comparisons.
+db/schema.sql	ad1ae5b1b0e65fc4f282e66b7ecf353f94571c6da9956c17e83a565bbce1f396	4B.7	Shipped legacy model backfill and exact historical system-text cleanup comparisons.
+db/task_archives_restore.go	5c88b2bee88f7ab628df8deffbbaf493ed68fc8b2187c7f72af342bd34eb6429	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+db/task_assets_test.go	c2ea0cdb2a6fdfd246f6ed3d7ca851e7771b9d77e8913c7ca537177357c9e143	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+db/task_context_unit_test.go	1d14a5e27d5a5c54100a8f1be67d05503e644e9309d0fe0cfc28e7157fac4993	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+db/tasks_test.go	ad63096158a3d6679c03ff9241262192eff1bd93f9fed959e4c950402b926359	5	Real Chinese-provider quota error detection and its positive regression fixtures.
+intercept/english_contracts_test.go	980fcf555428638723176ea668ba6c87c58a43a0ef0494269c1fabefcd4b7869	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/english_contracts_test.go	e6bcbbfdcaeed47f69030915abb6c35b08b63805ebf13def35479af80f949eed	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/english_contracts_test.go	43dcd36a89839d7b3eb4cf0f109a1793a69bfdc50657aa852cdf606f9a600cd2	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/english_contracts_test.go	dfed5fed6edf0a0ea89212ded1361d2cea4e8b235b0007588fe8892b3d340b5b	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/english_contracts_test.go	87c18741c8a50910db53e65d3b1daf01c9db800818f3b6e67d22fac2aff2da1f	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/intercept.go	968dc699f690747e3d9030d79e4c6babb9169974acd7ef898b6028324d052f99	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+intercept/intercept.go	450a0f8d4c7d75119811e7ad140490d8a3a0b0979e9e8906ca6d27f97ea491a9	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+intercept/legacy_judge.go	b20fc1f18e1d832517ec712ee41538944db56c68da8b2e1a3d3717356da46ab6	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	0de48ac1cbd457e0a6fdf7ef251bd36b3337bb04c9c399f8f8781aa551f4ed44	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	d56eebb379357046618b4769fd1cf4fa9735e0a5ea866eef717d569a184434cd	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	dc10e7d3afa7679639c506402da4069fc3237bf4674a29953a611d1afba4933d	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	8c308239356d1530c0fb057a7e9b47725800f61571714a7eb9f7f0f7695cde50	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	c3ae2bd5198f19cba886095a22a267c93accf17f760da545e289cac2c3c75c50	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	8b9b316a8cd07c230931ed22fb4b42639f942d956597ad2267df75c04170e684	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	eeaa43f673d1e3619be18adf7e9dc46c9d1131125a30f594c5403f37e66de6f0	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	44165bdb28c27509afb9d1f665a8a6d0fc2011a3497f188cbe60eaa3214d1414	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	3baff25e6bcca5ff6fc00cafc8a2d004fc91d078b4cf4ce71a39498b8159eb86	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	85c3a038a22cf011d2156a97f6ca503223d70f119367c287d5bd385754de6010	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	a60c60920d455cf007f87ab0f6a655ec981b9fb224551f5127a88804d5cd5e75	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	13dba97918d93179c68571992652ccd84f53e9065957dcf7c7ea787e62f76b0b	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	237fdb08dd8fb684530197b226306d9d408037b44adcbd4d0c3b8331929e4706	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	601b9fe7fd0fe7becf4eb470bf3e999b5686fb07252681735f571f546a9a8e2d	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	410c8776f60687efd36fe0a5374ea1925d7c6ede9e2734ec2d071f9c34fd7c6c	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/legacy_judge.go	453df37508cd98ee4f3dbc7dcaf2225e1af6ca82db19b4063a019bfd24c99afe	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/prompt.go	1526a24938faae64968e82982416260234cb453de3a7b9aff5bd7778fb479e12	4A.3	Frozen judge contracts and dual-language verdict markers or compatibility test inputs.
+intercept/prompt_test.go	a9f6aeb53fa0bc184966250decdaee32de02d75828833306f2e97ce7cdeeac26	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+intercept/review_context_test.go	b4ea2a75ccd12628f24c03082c8d21fcfa2e405d5b02f61999a62b9b01794494	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+intercept/review_context_test.go	44d392d47876871d0c85cc0027b9e84f1e970bf45fd6f6080317f0d3ba576d2a	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+intercept/trace_test.go	a26a94a80775b1251cc45adbf1f6f8cf6ddb85c2b319f56832ca4b2efc2ea95f	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+intercept/trace_test.go	83a9711ada289ba14f3ecde86308d37aa6a0634d9d224d021ed4b61b83af5569	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/channels_test.go	2c6686c96823a7da89c641899c3ce3fc0739889bfff178ba6eb065b665238e0a	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/channels_test.go	c18df3f0fc0455984fca2407ac99ae219d108d5d4110e46a813019b285b7e860	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/render_test.go	badae9349c7a53564fd640627b2962f76971f2373a5f8a24d61c28ba7fa408a3	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/render_test.go	8fb6d11f28ca9bc77c7f12ef082d57260e36f75126314995578fffa195ebe9ce	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/render_test.go	f33d0e7384418979a0d780a4739450530f9f70f722910c75b9ca84c76147bede	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/render_test.go	ac3d11b9622e8c47348facfb70a343208d5a18c8b9458db973ea7f0f41576597	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+notify/render_test.go	9af60a77be507c5d412fde3833025f6ecf0b2a785ab17c1895bd7967b673bfb7	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/assets_scope_test.go	6b47c88107feaac15f9f96020f91824742493e2299c720a04aca591f98b7b6bb	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+server/assets_scope_test.go	069147af928dcd85fbbcb3814506d7d49f3343658ddfd6ca87f6db8782b26baa	5	ICP filing and scope-validation input fixtures preserve real-world multilingual data handling.
+server/chat_mentions.go	21034c4d74017ab8f676a7aec534173a872a1f57eef38afe894db7f75fb31aa9	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/chat_mentions.go	69a05fdd29dd8fd729699e19fe1819bd8abfaa26408bff21a87f4ca0824294ed	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/chat_mentions.go	3f1615037a1dbe8e1626899d84804d4fbffe7206e926b84e8a0bbac35c851501	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/chat_mentions_test.go	72f7e16006affe9a50834e950e15728e4e1a5bf977bd64813190fc7264c51a48	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/chat_mentions_test.go	a0f0a05c869e803c7fb3e600016cc2d64a54fcf3d280119b8e1bc43f5e1cfb2e	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/conversations.go	8ea771426ea3e4941306314bb679c255fbd004cc0bde2ed139ddb18c5ea21da3	4A.5	Legacy default conversation title remains eligible for automatic renaming.
+server/english_contracts_test.go	22b16912d5c63ef52cdd22215e791d1d6fc18232df6f225c00a2ec736d1a2286	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/english_contracts_test.go	749b61dbf8361d82a0ac2d8dcd6a7b69ce1b405479e7cd3649a9521bdbd5e610	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/english_contracts_test.go	23715a4bb1029f22bd503dafe587f55bfca71cc6097aa87d5838b7136996acf5	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/english_contracts_test.go	c72dffc351103a82c86ec0b1412af0fe58d64fe5aebe16060cc64b38f7daea4b	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+server/finding_retests_test.go	5f2dfc155c2ddde1d1c67c298a25013ba1a78e5849aba795a20c7f98e2917d22	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/finding_traffic_test.go	f13722802ca8b05bf8de440875dc31e3fa2ccea5e448aaa77ad2f6893b603605	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/legacy_english.go	527a21e6291ab5c2ee5a1b18b8281baf013a24c1515c950ec824ea6e642a89d5	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	57df0dcb0cd547d4ccbf138bf3d782e838e9b012dd6590468d3e0962e193d6ef	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	36ad0bc31a577e442181060b82ff35cbf893f7b17092a2a1310a219e6ffb2859	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	fc0f81ccce0def12587808b72413fc693e5fdcd4eb1de2f8e82745c099291895	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	a0d24cc37b4d6cce1614b4da908dfa7d0c1db30b7504438bbc1bb69dd0f8d470	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	b2dcc3ee5b5b30d8b2c0baaaf1d53663546be9efe19e29af135b3bfd4d011bec	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	636cc78eaf0c93744e64c41cc26d3bb68ff04119e867089bfaa3bf0d58bef2bb	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	b64957e955b892bc7f3948a24e2f36838d1103cf17a990ec4d434b9305895572	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	7f7e9b2a6df17f0fcd4287a5f3988237fa2822658158db2e47ba1de8f4405733	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/legacy_english.go	087c58016eef4a7b08f6e8a0b739af7b9c63ccd0357299265261484abfcc6744	4B.2	Exact legacy agent metadata, reporter trigger, and traffic-description migration fingerprints.
+server/server.go	b7a6695e9de63d8f16ca06a755cccfe3902d59e35fc1325ee49a16cd3df2b9c6	5	Legacy intent and hint command aliases remain valid alongside English commands.
+server/server.go	c9376bf14f7c8fed595b52e2aa4ac25f025250d4aa1b35a3c6f1ed7555ec4f23	5	Legacy intent and hint command aliases remain valid alongside English commands.
+server/server.go	a7ccc9157718ffa946d42c8300b7c9adb1bf85f4dfb58f89e21b18c504311a49	5	Legacy intent and hint command aliases remain valid alongside English commands.
+server/server.go	85fae73a935c0b521e6b643ef38d60bb8c837695ed0f0a2652e112ac130adf4f	5	Legacy intent and hint command aliases remain valid alongside English commands.
+server/skill_upload_test.go	06af89bc94b7cfe28628b252b6ce18294a27a9a1d595f05c8179d3f6a021a91d	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	0efa54da1205640897f5ab29e039bb09a3f70c0c0b0391f5af22b7a71f34d322	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	938c24b1dadcb67cd96b4a21dd9f6faecf17f85040e21c03ba1e3b1e99f0c986	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	0a082ce5d559568317f4afb3fcb2d71ce1065f9136f055e40ab72ed992db6f25	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	0ea096ee8c535e1e5cbba6d6f9aeed3d8f20765f050b9c641cc7485bee9e5e97	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	675451035a4a84e3415e2ea210202fe1b76739c1eb2d020c73e2a1514053c5e6	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	d1faf180f112d4b354abb601abf16294525a6ed2cc9a9ad9cc26a047bf78b262	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	83b2f7ae608882d68fb4b53d9f23ef676282a7a3f7cbd74cd57409f1b870eb03	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	7fea79632949b333aaa347f9c0d38ba8114e3277aa7dd71a9a9ac665e7a617bb	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	282f9c592bf3580f9887a75437da2fc1fdbc49e5b70263ea5b71b48eb26d430b	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	7e413bf02d3701b851c04755045d93d3d2080b1a4ce1413e61b4b29b7ef5aba3	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	2644573cadd63384cac9e0d96f75e51662432c2efaba5bb2f52dfeb6a85e5fa7	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	c8b9c5e819147b29c0a9c3d0145822fb8cadd8c2f804049cda4787ee9b0e5d49	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	8878e0724698773e2029dc1db103f1003f53e9f3b6921f5c2723b8594cfeed36	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	447e7f025e37f2b772202c89c05711c228696602a70cfbd1fedebf9fa7158db8	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	e5208ab08d7dd9b4d3077745b60dcca3584bfca803d30283e7ec3ff474df90c3	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	7e62d79ed72bbaec0f3ddfcdb7d39892c385a0511e959d475073b3235147dd91	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	1ee67c20dd8dba2267fe609fc53bad6d8cde0d62c7db11c0c9e90524fcd2bcab	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	c8b9c5e819147b29c0a9c3d0145822fb8cadd8c2f804049cda4787ee9b0e5d49	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	8878e0724698773e2029dc1db103f1003f53e9f3b6921f5c2723b8594cfeed36	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	c6583b6d1c102442603cb098876b2fef010c7e854a71b90b2b44b11a9a6e8b78	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	c92f336248ef3e90aaf841cd86188b5ed658cd2ed2aa687273f6c46a6b0d1c0b	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	776b1643b49afc349cfc01bc820dbd4b98f6b849b36c1e7608063d56a45d8eb0	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/skill_upload_test.go	be883fe42754b92449d2aa9dd7d07ecda40184759b8d9d3342d10baa3e9f6176	5	CJK, GBK, and Unicode filename/content fixtures verify multilingual skill uploads and expected values.
+server/task_llm_test.go	76e8571bfbe5ef361393cdfd36c6759895bf345eded6abab79432f696c35abf6	5	Real Chinese-provider quota error detection and its positive regression fixtures.
+server/task_metadata_test.go	74e866a2c997649eb8237a9c05d7854e55c9e84f5899b4b0404390aa4ed199d1	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/task_templates_test.go	c1331acc6e875d741edca66c52e1e6ee0b9d1214248fc12c59a78b868d9cf757	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/task_templates_test.go	7d31426d97427abe8e5c65f45011f09cf2e4b27a86bc45040bb9f252cf617334	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/task_templates_test.go	69da0322eff90af5664255659423b58bc111ae55efa39dfaf5d97092131f9079	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+server/trigger_merge_test.go	893a4d399e3770ce39f85efbbf27b0fc7e8bf9b551e18e2bc84070723abe7141	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+sidequestion/context_test.go	52e6c35eb1ef794676ff94783d592df8a3126ba3b1359954c68b8848ad9d7b25	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+sidequestion/context_test.go	487545c044b2e93b78f7dd6a2f42f8e09dc6226df0fb051f611f2bed96bd45c6	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+sidequestion/context_test.go	74b5ede9a88921d5ed5b7b43f38c52d39fdd43ae978134d62bf0ef4232e8993d	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+sidequestion/context_test.go	89db6586d0090c58ed58ccc7466d63e0a61aa18c8edcf85c1f576742e09c5b47	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+skills/api-recon/reference.md	885037a416f94ef7e5bda64da598b4af50aa4e2d13345eeeefafbd34f1948a4a	5	Visible real-world localized authentication-response patterns used to match target websites.
+skills/api-recon/scripts/preload.js	d6ab2edd27f8f1d888a68487a99ff3952777563cee24b4984f899aaf49a20445	5	Visible real-world localized authentication-response patterns used to match target websites.
+traffic/traffic_store_test.go	4d559d9f1ff5804733d36f67c53e0ab771b17d143c1406467c349cab2a2c05cc	5	Deliberate multibyte input exercises UTF-8 boundaries, rune/token limits, search, or truncation.
+web/src/app/(main)/function/tasks/page.tsx	3212fa462295c8c7c3020e6d2fbbb66e13ac1fcbce6f7db35313c531ddb91567	5	Legacy upload-heading comparison prevents duplicate attachment blocks in saved task descriptions.
+web/src/app/(main)/system/notify/_components/channel-fields.ts	2c9d531a195583c3b184934a93d5dbb5975efa53cdb825f4ee3fee77a50d9129	5	Full-width comma remains accepted when parsing pasted lists.
+web/src/app/(main)/system/notify/_components/channel-fields.ts	943d331c02434d9aeca5df53b044fe8a64719ea4390d9276c1c2f4cbbcb72761	5	Full-width comma remains accepted when parsing pasted lists.
+web/src/app/(main)/system/notify/page.tsx	50026d406e8712090fa0c68a064fd84b5afe4707f37e28e795708ac065254ae0	5	Full-width comma remains accepted when parsing pasted lists.
+web/src/components/transcript.tsx	5373777c736688323e00d6b6b323bebf6789be087565425956d65eee6f0e88c4	4A.4	Legacy approval activity parser keeps persisted transcript entries readable.
+web/src/lib/approval-source.ts	1545d1b05edf4486e2060d06bad8818a83fcc934207d9b0992d7ea85622772a5	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+web/src/lib/approval-source.ts	5fbf7be4670398b84230ea0a9934f439c8398730cf5e6e71810f27f00ea2d2b3	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.
+web/src/lib/chat-mentions.test.mjs	545a3ce64dc630032703eb33a899e1114c5aa656d7145c70080a5954ab73d636	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+web/src/lib/chat-mentions.test.mjs	4fc730def086bd83e4e2a28eef29e6cbed1632711f713355404f5ad1e7898039	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+web/src/lib/chat-mentions.test.mjs	1561099d8919e21f9df70b4e06fffc4ba92c6f7133e9b963134c650057488fd5	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+web/src/lib/chat-mentions.ts	4cb6b09e5b805ee343071c66094bcf598eabc57146abc569e5ef81917eb4d393	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+web/src/lib/chat-mentions.ts	c11988247ef6b508b2402cd9b6d88ec8fe433817a60e8cfcb69753a13c05236e	4A.2	Legacy mention wire aliases, title compatibility inputs, and bracket escaping remain readable.
+web/src/lib/company-scope.ts	65e87c35b8726854f6b5354a5f53cf7d0996c8c2292052dfefe4fbb9679f991e	5	Real-world ICP filing marker and full-width domain-dot detection.
+web/src/lib/english-contracts.test.mjs	f8b0bb9eb3114cce1b28442fcd3d7f5c6c4225a18198772688a15fc486197965	4A.1	Permanent support for legacy model reason prefixes in stored rows, archives, and audit snapshots.

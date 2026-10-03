@@ -36,7 +36,7 @@ func englishFlag(t *testing.T, d *DB, key string) bool {
 }
 
 func TestEnglishTargetReadiness(t *testing.T) {
-	for _, value := range []string{"", "  ", "legacy \u6a21\u578b", "Fullwidth\uff1a", "Japanese \u3042"} {
+	for _, value := range []string{"", "  ", "legacy 模型", "Fullwidth：", "Japanese あ"} {
 		if EnglishTargetReady(value) {
 			t.Errorf("accepted untranslated target %q", value)
 		}
@@ -100,7 +100,7 @@ func TestEnglishPromptDefersUntranslatedTarget(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { d.DeleteAgent(key); d.Exec(`DELETE FROM settings WHERE key=$1`, key+"_prompt_english_v1") })
-	legacy := "\u65e7\u9ed8\u8ba4" // A deliberate legacy-language fixture, represented without raw CJK.
+	legacy := "旧默认" // A deliberate legacy-language fixture checks migration readiness.
 	d.SavePrompt(a.ID, legacy, "original", "system")
 	if err := d.MigrateEnglishPrompt(key, legacy, []string{englishDigest(legacy)}); err != nil {
 		t.Fatal(err)
@@ -223,7 +223,7 @@ func TestEnglishToolColumnsPreserveCustomization(t *testing.T) {
 func TestEnglishToolDefersColumnsIndependently(t *testing.T) {
 	d := englishDB(t)
 	key := fmt.Sprintf("english-tool-defer-%d", time.Now().UnixNano())
-	old := EnglishToolDefault{Key: key, Description: "legacy \u6a21\u578b", Schema: json.RawMessage(`{"description":"legacy"}`)}
+	old := EnglishToolDefault{Key: key, Description: "legacy 模型", Schema: json.RawMessage(`{"description":"legacy"}`)}
 	d.SeedTool(key, old.Description, old.Schema, nil)
 	t.Cleanup(func() {
 		d.Exec(`DELETE FROM tools WHERE key=$1`, key)
