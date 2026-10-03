@@ -42,7 +42,7 @@ func decodeConversationRequest(w http.ResponseWriter, r *http.Request, value any
 	if err := decode(r, value); err != nil {
 		var tooLarge *http.MaxBytesError
 		if errors.As(err, &tooLarge) {
-			writeErr(w, http.StatusRequestEntityTooLarge, "请求正文过大")
+			writeErr(w, http.StatusRequestEntityTooLarge, "request body too large")
 		} else {
 			writeErr(w, http.StatusBadRequest, err.Error())
 		}
@@ -97,11 +97,11 @@ func (s *Server) pgCreateConversation(w http.ResponseWriter, r *http.Request) {
 	}
 	req.AgentKey = strings.TrimSpace(req.AgentKey)
 	if req.AgentKey == "" {
-		writeErr(w, 400, "agent_key 不能为空")
+		writeErr(w, 400, "agent_key must not be empty")
 		return
 	}
 	if utf8.RuneCountInString(req.AgentKey) > maxConversationAgentKeyRunes {
-		writeErr(w, 400, fmt.Sprintf("agent_key 最多 %d 个字符", maxConversationAgentKeyRunes))
+		writeErr(w, 400, fmt.Sprintf("agent_key must be at most %d characters", maxConversationAgentKeyRunes))
 		return
 	}
 	a, err := pg.GetAgentByKey(req.AgentKey)
@@ -110,12 +110,12 @@ func (s *Server) pgCreateConversation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if a == nil {
-		writeErr(w, 404, "agent 不存在")
+		writeErr(w, 404, "agent does not exist")
 		return
 	}
 	if req.LLMProfileID != nil {
 		if _, ok := s.loadProfileConfig(*req.LLMProfileID); !ok {
-			writeErr(w, 400, "指定的 LLM 配置不存在或未设置 API Key")
+			writeErr(w, 400, "the specified LLM profile does not exist or has no API Key set")
 			return
 		}
 	}
@@ -124,7 +124,7 @@ func (s *Server) pgCreateConversation(w http.ResponseWriter, r *http.Request) {
 		title = defaultConversationTitle
 	}
 	if utf8.RuneCountInString(title) > maxConversationTitleRunes {
-		writeErr(w, 400, fmt.Sprintf("标题最多 %d 个字符", maxConversationTitleRunes))
+		writeErr(w, 400, fmt.Sprintf("title must be at most %d characters", maxConversationTitleRunes))
 		return
 	}
 	c, err := pg.CreateConversation(req.AgentKey, title, req.LLMProfileID)
@@ -148,7 +148,7 @@ func (s *Server) pgUpdateConversation(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.LLMProfileID != nil {
 		if _, ok := s.loadProfileConfig(*req.LLMProfileID); !ok {
-			writeErr(w, 400, "指定的 LLM 配置不存在或未设置 API Key")
+			writeErr(w, 400, "the specified LLM profile does not exist or has no API Key set")
 			return
 		}
 	}
@@ -195,17 +195,17 @@ func (s *Server) pgRenameConversation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.Title == nil && req.Pinned == nil {
-		writeErr(w, 400, "至少需要提供 title 或 pinned")
+		writeErr(w, 400, "at least one of title or pinned is required")
 		return
 	}
 	if req.Title != nil {
 		title := strings.TrimSpace(*req.Title)
 		if title == "" {
-			writeErr(w, 400, "标题不能为空")
+			writeErr(w, 400, "title must not be empty")
 			return
 		}
 		if utf8.RuneCountInString(title) > maxConversationTitleRunes {
-			writeErr(w, 400, fmt.Sprintf("标题最多 %d 个字符", maxConversationTitleRunes))
+			writeErr(w, 400, fmt.Sprintf("title must be at most %d characters", maxConversationTitleRunes))
 			return
 		}
 		req.Title = &title
@@ -272,7 +272,7 @@ func (s *Server) pgDeleteConversationsBatch(w http.ResponseWriter, r *http.Reque
 	seen := make(map[int64]struct{}, len(request.IDs))
 	for _, id := range request.IDs {
 		if id <= 0 {
-			writeErr(w, http.StatusBadRequest, "对话 id 无效")
+			writeErr(w, http.StatusBadRequest, "invalid conversation id")
 			return
 		}
 		if _, exists := seen[id]; exists {
@@ -282,7 +282,7 @@ func (s *Server) pgDeleteConversationsBatch(w http.ResponseWriter, r *http.Reque
 		ids = append(ids, id)
 	}
 	if len(ids) == 0 || len(ids) > maxConversationDeleteBatch {
-		writeErr(w, http.StatusBadRequest, fmt.Sprintf("ids 数量必须为 1-%d", maxConversationDeleteBatch))
+		writeErr(w, http.StatusBadRequest, fmt.Sprintf("ids count must be 1-%d", maxConversationDeleteBatch))
 		return
 	}
 	for _, id := range ids {
@@ -404,7 +404,7 @@ func (s *Server) pgSendConversationMessage(w http.ResponseWriter, r *http.Reques
 	}
 	var req struct {
 		Message     string           `json:"message"`
-		Attachments []chatAttachment `json:"attachments,omitempty"` // 方式1 上传的文件(路径相对会话工作目录)
+		Attachments []chatAttachment `json:"attachments,omitempty"` // method-1 uploaded files (paths relative to the conversation work dir)
 	}
 	if err := decode(r, &req); err != nil {
 		writeErr(w, 400, err.Error())
@@ -412,7 +412,7 @@ func (s *Server) pgSendConversationMessage(w http.ResponseWriter, r *http.Reques
 	}
 	msg := strings.TrimSpace(req.Message)
 	if msg == "" && len(req.Attachments) == 0 {
-		writeErr(w, 400, "消息不能为空")
+		writeErr(w, 400, "message must not be empty")
 		return
 	}
 	agentMessage, ok := s.prepareChatMentionMessage(w, msg)
@@ -432,7 +432,7 @@ func (s *Server) pgSendConversationMessage(w http.ResponseWriter, r *http.Reques
 	s.chatMu.Lock()
 	if s.chatBusy[busyKey] {
 		s.chatMu.Unlock()
-		writeErr(w, 409, "该会话正在处理上一条消息，请稍候")
+		writeErr(w, 409, "this conversation is still processing the previous message, please wait")
 		return
 	}
 	s.chatBusy[busyKey] = true
@@ -515,7 +515,7 @@ func (s *Server) runConversationTurn(ctx context.Context, cancel context.CancelC
 	}()
 	// Only the first turn executes a historical retest. Follow-up conversation
 	// turns may explain the sealed result; the result tool refuses to overwrite it.
-	finishStatus, finishReason := "failed", "复测未能启动"
+	finishStatus, finishReason := "failed", "retest failed to start"
 	if c.AgentKey == db.FindingRetestAgentKey {
 		// Read without the run cancellation so an immediate stop still seals pending.
 		r, err := s.m.pg.FindingRetestForConversation(context.Background(), c.ID)
@@ -523,7 +523,7 @@ func (s *Server) runConversationTurn(ctx context.Context, cancel context.CancelC
 			// The sealing defer below needs r.ID, which we do not have here. Seal by
 			// conversation instead, otherwise the row stays 'pending' forever.
 			log.Printf("[conv %d] load retest: %v", c.ID, err)
-			if err := s.m.pg.FailPendingRetestForConversation(c.ID, "复测状态读取失败，请重新发起"); err != nil {
+			if err := s.m.pg.FailPendingRetestForConversation(c.ID, "failed to read retest status, please start it again"); err != nil {
 				log.Printf("[conv %d] seal retest: %v", c.ID, err)
 			}
 			return
@@ -531,7 +531,7 @@ func (s *Server) runConversationTurn(ctx context.Context, cancel context.CancelC
 		if r != nil && r.Status == "pending" {
 			defer func() {
 				if ctx.Err() != nil {
-					finishStatus, finishReason = "stopped", "复测已停止或服务已关闭"
+					finishStatus, finishReason = "stopped", "retest stopped or the service has shut down"
 				}
 				s.finishRetest(r.ID, finishStatus, finishReason)
 			}()
@@ -570,13 +570,13 @@ func (s *Server) runConversationTurn(ctx context.Context, cancel context.CancelC
 			log.Printf("[conv %d] append activity failed: %v", c.ID, err)
 		}
 	}
-	// On a manual stop ctx is cancelled; Chat already emits a clean "已手动停止"
+	// On a manual stop ctx is cancelled; Chat already emits a clean manual-stop
 	// step, so skip the raw-error entry — only surface genuine failures.
 	if _, err := ca.Chat(ctx, c.AgentKey, sessionID, msg, maxTurns, maxDuration, webSearch, emit); err != nil {
 		finishReason = err.Error()
 		if ctx.Err() == nil {
 			_, _ = pg.AppendConvActivity(c.ID, db.Activity{Worker: c.AgentKey, Kind: "text", IsError: true,
-				Summary: "（出错：" + err.Error() + "）", Detail: err.Error()})
+				Summary: "(error: " + err.Error() + ")", Detail: err.Error()})
 		}
 	} else {
 		finishStatus, finishReason = "completed", ""
@@ -584,16 +584,16 @@ func (s *Server) runConversationTurn(ctx context.Context, cancel context.CancelC
 	_ = pg.TouchConversation(c.ID)
 }
 
-// triggerBehavior is an agent's cached P3 trigger post-processing策略 (see the
+// triggerBehavior is an agent's cached P3 trigger post-processing policy (see the
 // agents table trigger_* columns). Read once per fire in StartTriggeredRun so the
 // pump never touches the DB while holding queueMu.
 type triggerBehavior struct {
 	runMode     string // serial | parallel
-	mergeMode   string // by_task | all | none (serial 用;parallel 忽略,每条各自一个会话)
-	maxParallel int    // parallel 用的每 agent 并发上限;<=0=不限
+	mergeMode   string // by_task | all | none (used by serial; ignored by parallel, where each fire gets its own conversation)
+	maxParallel int    // per-agent concurrency cap for parallel; <=0 = unlimited
 }
 
-// readTriggerBehavior loads an agent's策略, falling back to safe defaults
+// readTriggerBehavior loads an agent's policy, falling back to safe defaults
 // (serial / all / 5) on any error or unknown enum value.
 func (s *Server) readTriggerBehavior(agentKey string) triggerBehavior {
 	b := triggerBehavior{runMode: "serial", mergeMode: "all", maxParallel: 5}
@@ -616,7 +616,7 @@ func (s *Server) readTriggerBehavior(agentKey string) triggerBehavior {
 }
 
 // StartTriggeredRun enqueues a P3 trigger fire for agentKey and pumps the queue. The
-// agent's策略 decides concurrency + merge: serial → run one at a time (optionally
+// agent's policy decides concurrency + merge: serial → run one at a time (optionally
 // merging by task / all / none); parallel → run each fire in its own concurrent
 // conversation up to trigger_max_parallel. Distinct agents always run concurrently.
 func (s *Server) StartTriggeredRun(agentKey, title, message string, taskID int64, mergeable bool, taskDesc, taskGoal string) {
@@ -719,9 +719,9 @@ func taskContextHeader(taskID int64, desc, goal string) string {
 		return ""
 	}
 	if goal != "" {
-		return fmt.Sprintf("【任务 #%d %s（目标：%s）】", taskID, trunc(desc, 200), trunc(goal, 500))
+		return fmt.Sprintf("[Task #%d %s (Goal: %s)]", taskID, trunc(desc, 200), trunc(goal, 500))
 	}
-	return fmt.Sprintf("【任务 #%d %s】", taskID, trunc(desc, 200))
+	return fmt.Sprintf("[Task #%d %s]", taskID, trunc(desc, 200))
 }
 
 // finalTriggerMessage renders the message actually sent to the agent for a single
