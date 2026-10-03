@@ -10,9 +10,9 @@ import (
 	"github.com/Autumn-27/artex/selfupdate"
 )
 
-// releaseCache 是保护 GitHub 配额的那一层：未认证的 API 只有 60 次/小时/IP，
-// 而顶栏的"有新版本"提示每次整页加载都会查一次。缓存一旦失效，用户多开几个
-// 标签页就会把配额耗光，之后真想更新反而查不动。
+// releaseCache protects the unauthenticated GitHub API quota of 60 requests/hour/IP.
+// The top-bar update indicator checks on every full-page load; broken caching would let
+// a few tabs exhaust the quota before the user actually wants to update.
 
 func newTestCache(fetch func(context.Context, *http.Client) (*selfupdate.Release, error)) *releaseCache {
 	return &releaseCache{fetch: fetch}
@@ -35,7 +35,7 @@ func TestReleaseCacheServesFromCache(t *testing.T) {
 		}
 	}
 	if calls != 1 {
-		t.Errorf("5 次查询只应回源 1 次，实际 %d 次", calls)
+		t.Errorf("5 queries should fetch once, got %d", calls)
 	}
 }
 
@@ -49,12 +49,12 @@ func TestReleaseCacheForceBypasses(t *testing.T) {
 	if _, err := c.get(t.Context(), nil, false); err != nil {
 		t.Fatal(err)
 	}
-	// 用户点「检查更新」必须拿到实时结果，否则刚发布的版本要等缓存过期才看得见。
+	// Explicit Check for updates must fetch live data so newly published releases appear immediately.
 	if _, err := c.get(t.Context(), nil, true); err != nil {
 		t.Fatal(err)
 	}
 	if calls != 2 {
-		t.Errorf("force 应绕过缓存，期望回源 2 次，实际 %d 次", calls)
+		t.Errorf("force should bypass cache; want 2 fetches, got %d", calls)
 	}
 }
 
@@ -68,13 +68,13 @@ func TestReleaseCacheExpiresAfterTTL(t *testing.T) {
 	if _, err := c.get(t.Context(), nil, false); err != nil {
 		t.Fatal(err)
 	}
-	// 把落库时间往前拨到刚过期，模拟 TTL 到点。
+	// Move the timestamp just past expiration to simulate the TTL elapsing.
 	c.at = time.Now().Add(-releaseTTL - time.Second)
 	if _, err := c.get(t.Context(), nil, false); err != nil {
 		t.Fatal(err)
 	}
 	if calls != 2 {
-		t.Errorf("TTL 过期后应重新回源，期望 2 次，实际 %d 次", calls)
+		t.Errorf("expired TTL should refetch; want 2 fetches, got %d", calls)
 	}
 }
 
@@ -82,30 +82,30 @@ func TestReleaseCacheUsesShorterTTLForErrors(t *testing.T) {
 	calls := 0
 	c := newTestCache(func(context.Context, *http.Client) (*selfupdate.Release, error) {
 		calls++
-		return nil, errors.New("github 不可达")
+		return nil, errors.New("GitHub unreachable")
 	})
 
 	if _, err := c.get(t.Context(), nil, false); err == nil {
-		t.Fatal("期望返回错误")
+		t.Fatal("expected an error")
 	}
-	// 失败结果也要缓存一会儿，否则 GitHub 不可达时每次页面加载都白等一次超时。
+	// Briefly cache failures to avoid waiting for a fresh timeout on every page load during outages.
 	if _, err := c.get(t.Context(), nil, false); err == nil {
-		t.Fatal("期望返回错误")
+		t.Fatal("expected an error")
 	}
 	if calls != 1 {
-		t.Errorf("错误应短时缓存，期望回源 1 次，实际 %d 次", calls)
+		t.Errorf("errors should be cached briefly; want 1 fetch, got %d", calls)
 	}
 
-	// 但错误的 TTL 必须明显短于成功的，网络恢复后要能很快自愈。
+	// Error TTL must be much shorter than success TTL to detect recovery quickly.
 	if releaseErrTTL >= releaseTTL {
-		t.Fatalf("错误 TTL(%v) 必须短于成功 TTL(%v)", releaseErrTTL, releaseTTL)
+		t.Fatalf("error TTL (%v) must be shorter than success TTL (%v)", releaseErrTTL, releaseTTL)
 	}
 	c.at = time.Now().Add(-releaseErrTTL - time.Second)
 	if _, err := c.get(t.Context(), nil, false); err == nil {
-		t.Fatal("期望返回错误")
+		t.Fatal("expected an error")
 	}
 	if calls != 2 {
-		t.Errorf("错误 TTL 过期后应重试，期望 2 次，实际 %d 次", calls)
+		t.Errorf("expired error TTL should retry; want 2 fetches, got %d", calls)
 	}
 }
 
@@ -118,38 +118,38 @@ func TestReleaseCacheDoesNotPoisonOnCallerCancel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 访客关掉标签页会取消请求。那不代表 GitHub 有问题，绝不能把"已取消"
-	// 写进缓存——否则接下来 30 分钟内每个访客都会收到一条莫名其妙的错误。
+	// Closing a browser tab cancels a request without implying a GitHub failure. Never cache
+	// cancellation, or every visitor could receive an unrelated error for the next 30 minutes.
 	c.fetch = func(ctx context.Context, _ *http.Client) (*selfupdate.Release, error) {
 		return nil, ctx.Err()
 	}
-	c.at = time.Now().Add(-releaseTTL - time.Second) // 让缓存过期，逼它回源
+	c.at = time.Now().Add(-releaseTTL - time.Second) // Expire the cache and force a fetch.
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if _, err := c.get(ctx, nil, false); err == nil {
-		t.Fatal("调用方已取消时应把错误透传给它")
+		t.Fatal("caller cancellation should be forwarded")
 	}
 
-	// 关键不变量：被取消的那一次不留下任何痕迹——缓存里既没有"已取消"这个错误，
-	// 也还保着上一次的好结果。
+	// Invariant: cancellation leaves no trace in the cache, neither a cancellation error
+	// nor the loss of the previous successful result.
 	if c.err != nil {
-		t.Fatalf("取消错误不应写进缓存，得到 %v", c.err)
+		t.Fatalf("cancellation error must not be cached, got %v", c.err)
 	}
 	if c.rel == nil || c.rel.TagName != "v0.3.8" {
-		t.Fatalf("缓存应保留上一次的好结果，得到 %+v", c.rel)
+		t.Fatalf("cache should retain the last successful result, got %+v", c.rel)
 	}
 
-	// 那次取消没换来任何新数据，所以下一个访客理应重新回源——而且能正常拿到结果，
-	// 不会被上一次的取消连累。
+	// Cancellation obtained no new data, so the next visitor must fetch again successfully
+	// without inheriting the previous cancellation.
 	c.fetch = func(context.Context, *http.Client) (*selfupdate.Release, error) {
 		return good, nil
 	}
 	rel, err := c.get(t.Context(), nil, false)
 	if err != nil {
-		t.Fatalf("取消之后的正常请求不应报错: %v", err)
+		t.Fatalf("normal request after cancellation should succeed: %v", err)
 	}
 	if rel == nil || rel.TagName != "v0.3.8" {
-		t.Fatalf("应拿到正常结果，得到 %+v", rel)
+		t.Fatalf("expected successful result, got %+v", rel)
 	}
 }
