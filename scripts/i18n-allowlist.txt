@@ -1,0 +1,1 @@
+# ARTEX no-CJK gate allowlist (path:content). See scripts/check-no-cjk.sh.
