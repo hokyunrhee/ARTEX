@@ -2,7 +2,7 @@
 // These functions manage cookies in the browser only.
 // Server actions handle cookie updates on the server side.
 
-function writeClientCookie(serializedCookie: string) {
+export function writeClientCookie(serializedCookie: string) {
   // biome-ignore lint/suspicious/noDocumentCookie: This project still uses document.cookie for broad browser support.
   document.cookie = serializedCookie;
 }
